@@ -15,8 +15,3 @@ tolerations:
 
 rbac:
   pspEnabled: false
-
-
-
-
-

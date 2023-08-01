@@ -5,7 +5,7 @@
 
 
 resource "aws_iam_role" "role_lambda_metrics" {
-  name = "role_lambda_metrics-${local.suffix}"
+  name               = "role_lambda_metrics-${local.suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -24,9 +24,9 @@ EOF
 }
 
 module "scaling_metrics" {
-
   source  = "terraform-aws-modules/lambda/aws"
   version = "4.6.1"
+
   source_path = [
     "../../../source/compute_plane/python/lambda/scaling_metrics/",
     {
@@ -51,43 +51,40 @@ module "scaling_metrics" {
   ]
 
   function_name = var.lambda_name_scaling_metrics
-  handler = "scaling_metrics.lambda_handler"
-  memory_size = 1024
-  timeout = 60
-  runtime = var.lambda_runtime
-  create_role = false
-  lambda_role = aws_iam_role.role_lambda_metrics.arn
+  handler       = "scaling_metrics.lambda_handler"
+  memory_size   = 1024
+  timeout       = 60
+  runtime       = var.lambda_runtime
+  create_role   = false
+  lambda_role   = aws_iam_role.role_lambda_metrics.arn
 
-  vpc_subnet_ids = var.vpc_private_subnet_ids
+  vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
-  build_in_docker = true
-  docker_image =  "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
+  build_in_docker        = true
+  docker_image           = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
   use_existing_cloudwatch_log_group = false
   environment_variables = {
-    STATE_TABLE_CONFIG=var.ddb_state_table,
-    NAMESPACE=var.namespace_metrics,
-    DIMENSION_NAME=var.dimension_name_metrics,
-    DIMENSION_VALUE=var.cluster_name,
-    PERIOD=var.period_metrics,
-    METRICS_NAME=var.metric_name,
-    SQS_QUEUE_NAME=var.sqs_queue,
-    REGION = var.region
-    TASK_QUEUE_SERVICE = var.task_queue_service,
-    TASK_QUEUE_CONFIG = var.task_queue_config,
-    ERROR_LOG_GROUP=var.error_log_group,
-    ERROR_LOGGING_STREAM=var.error_logging_stream,
-    TASKS_QUEUE_NAME=var.tasks_queue_name,
+    STATE_TABLE_CONFIG   = var.ddb_state_table,
+    NAMESPACE            = var.namespace_metrics,
+    DIMENSION_NAME       = var.dimension_name_metrics,
+    DIMENSION_VALUE      = var.cluster_name,
+    PERIOD               = var.period_metrics,
+    METRICS_NAME         = var.metric_name,
+    SQS_QUEUE_NAME       = var.sqs_queue,
+    REGION               = var.region
+    TASK_QUEUE_SERVICE   = var.task_queue_service,
+    TASK_QUEUE_CONFIG    = var.task_queue_config,
+    ERROR_LOG_GROUP      = var.error_log_group,
+    ERROR_LOGGING_STREAM = var.error_logging_stream,
+    TASKS_QUEUE_NAME     = var.tasks_queue_name,
   }
-   tags = {
-    service     = "htc-grid"
+  tags = {
+    service = "htc-grid"
   }
 }
-
-
-
 
 resource "aws_cloudwatch_event_rule" "scaling_metrics_event_rule" {
   name                = "scaling_metrics_event_rule-${local.suffix}"
@@ -120,7 +117,7 @@ resource "aws_iam_policy" "lambda_metrics_logging_policy" {
   name        = "lambda_metrics_logging_policy-${local.suffix}"
   path        = "/"
   description = "IAM policy for logging from a lambda"
-  policy = <<EOF
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -142,7 +139,7 @@ resource "aws_iam_policy" "lambda_metrics_data_policy" {
   name        = "lambda_metrics_data_policy-${local.suffix}"
   path        = "/"
   description = "IAM policy for accessing DDB and SQS from a lambda"
-  policy = <<EOF
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

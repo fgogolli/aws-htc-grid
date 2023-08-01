@@ -1,7 +1,7 @@
 awsRegion: ${region}
 
 autoDiscovery:
-  clusterName: ${eks_cluster_id}
+  clusterName: ${cluster_name}
 extraArgs:
   logtostderr: true
   stderrthreshold: info

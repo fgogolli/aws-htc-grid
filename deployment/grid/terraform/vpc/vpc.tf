@@ -22,7 +22,8 @@ locals {
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  version = "5.0.0"
+  version = "~> 5.0"
+
   name = "${var.cluster_name}-vpc"
   cidr = "10.0.0.0/16"
   azs = data.aws_availability_zones.available.names
@@ -33,6 +34,7 @@ module "vpc" {
   # required for private endpoint
   enable_dns_hostnames = true
   enable_dns_support = true
+
   tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
@@ -50,9 +52,12 @@ module "vpc" {
 
 module "vpc_endpoints" {
   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "~> 5.0"
+
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.vpc.default_security_group_id]
   create = true
+
   endpoints = {
     sts = {
       service = "sts"
@@ -158,12 +163,12 @@ resource "aws_security_group_rule" "https" {
   security_group_id = module.vpc.default_security_group_id
 }
 
-resource "aws_security_group_rule" "egress_rule" {
-  type              = "egress"
-  from_port        = 0
-  to_port          = 0
-  protocol         = "-1"
-  cidr_blocks      = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
-  security_group_id = module.vpc.default_security_group_id
-}
+# resource "aws_security_group_rule" "egress_rule" {
+#   type              = "egress"
+#   from_port        = 0
+#   to_port          = 0
+#   protocol         = "-1"
+#   cidr_blocks      = ["0.0.0.0/0"]
+#   ipv6_cidr_blocks = ["::/0"]
+#   security_group_id = module.vpc.default_security_group_id
+# }

@@ -13,7 +13,7 @@ terraform {
       version = "~> 3.10"
     }
     null = {
-      source = "hashicorp/null"
+      source  = "hashicorp/null"
       version = "~> 3.1.0"
     }
   }
@@ -23,7 +23,7 @@ terraform {
 
 
 provider "aws" {
-  region  = var.region
+  region = var.region
 }
 
 provider "null" {

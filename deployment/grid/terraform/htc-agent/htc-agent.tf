@@ -189,9 +189,4 @@ resource "helm_release" "htc_agent" {
     value = var.min_htc_agents
   }
 
-
-
-
 }
-
-

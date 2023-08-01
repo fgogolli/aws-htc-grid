@@ -4,7 +4,7 @@
 
 resource "tls_private_key" "alb_certificate" {
   algorithm = "RSA"
-  rsa_bits = 4096
+  rsa_bits  = 4096
 }
 
 
@@ -21,18 +21,18 @@ resource "tls_self_signed_cert" "alb_certificate" {
 
   # Reasonable set of uses for a server SSL certificate.
   allowed_uses = [
-      "key_encipherment",
-      "digital_signature",
-      "server_auth",
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
   ]
 
 
   subject {
-      common_name  = "amazon.com"
-      organization = "AWS"
-      country = "LU"
-      locality = "LU"
-      organizational_unit = "AWS"
+    common_name         = "amazon.com"
+    organization        = "AWS"
+    country             = "LU"
+    locality            = "LU"
+    organizational_unit = "AWS"
   }
 }
 
@@ -44,23 +44,19 @@ resource "aws_iam_server_certificate" "alb_certificate" {
 }
 
 
-
-
-
-
 resource "kubernetes_ingress_v1" "grafana_ingress" {
   wait_for_load_balancer = true
   metadata {
-    name = "grafana-ingress"
+    name      = "grafana-ingress"
     namespace = "grafana"
     annotations = {
-        "kubernetes.io/ingress.class"=  "alb"
-        "alb.ingress.kubernetes.io/scheme" = "internet-facing"
+      "kubernetes.io/ingress.class"      = "alb"
+      "alb.ingress.kubernetes.io/scheme" = "internet-facing"
 
-        "alb.ingress.kubernetes.io/listen-ports" = "[{\"HTTP\": 80},{\"HTTPS\":443}]"
-        "alb.ingress.kubernetes.io/certificate-arn"= aws_iam_server_certificate.alb_certificate.arn
-        "alb.ingress.kubernetes.io/actions.ssl-redirect"= "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}"
-        "alb.ingress.kubernetes.io/subnets" = join(",",var.vpc_public_subnet_ids)
+      "alb.ingress.kubernetes.io/listen-ports"         = "[{\"HTTP\": 80},{\"HTTPS\":443}]"
+      "alb.ingress.kubernetes.io/certificate-arn"      = aws_iam_server_certificate.alb_certificate.arn
+      "alb.ingress.kubernetes.io/actions.ssl-redirect" = "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}"
+      "alb.ingress.kubernetes.io/subnets"              = join(",", var.vpc_public_subnet_ids)
     }
   }
 
@@ -73,7 +69,7 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
           backend {
             service {
               name = "ssl-redirect"
-              port  {
+              port {
                 name = "use-annotation"
               }
             }
@@ -111,8 +107,8 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
   // }
   depends_on = [
     #kubernetes_namespace.grafana,
-    module.eks_blueprints_kubernetes_addons,
-    module.eks_blueprints_kubernetes_addons_for_alb
+    module.eks_blueprints_addons //,
+    //module.eks_blueprints_kubernetes_addons_for_alb
   ]
   provisioner "local-exec" {
     when    = destroy
@@ -123,22 +119,22 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
 resource "kubernetes_config_map" "dashboard" {
   metadata {
     namespace = "grafana"
-    name = "grafana-dashboard"
-    labels =  {
-       grafana_dashboard= "1"
+    name      = "grafana-dashboard"
+    labels = {
+      grafana_dashboard = "1"
     }
   }
 
   data = {
-    "htc-metrics.json" = file("${path.module}/htc-dashboard.json")
+    "htc-metrics.json"        = file("${path.module}/htc-dashboard.json")
     "kubernetes-metrics.json" = file("${path.module}/kubernetes-dashboard.json")
   }
 
   depends_on = [
     #kubernetes_namespace.grafana,
     aws_iam_server_certificate.alb_certificate,
-    module.eks_blueprints_kubernetes_addons,
-    module.eks_blueprints_kubernetes_addons_for_alb
+    module.eks_blueprints_addons //,
+    //module.eks_blueprints_kubernetes_addons_for_alb
   ]
 
 }

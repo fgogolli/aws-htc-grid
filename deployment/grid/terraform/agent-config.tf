@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 locals {
-  agent_config =<<EOF
+  agent_config = <<EOF
 {
   "region": "${var.region}",
   "sqs_endpoint": "https://sqs.${var.region}.amazonaws.com",
@@ -60,7 +60,7 @@ resource "kubernetes_config_map" "htcagentconfig" {
   }
 
   data = {
-     "Agent_config.tfvars.json" = local.agent_config
+    "Agent_config.tfvars.json" = local.agent_config
   }
   depends_on = [
     module.compute_plane,
@@ -87,8 +87,8 @@ resource "kubernetes_config_map" "htcagentconfig" {
 
 
 resource "local_file" "agent_config_file" {
-    content     =  local.agent_config
-    filename = "${path.module}/${var.agent_configuration_filename}"
+  content  = local.agent_config
+  filename = "${path.module}/${var.agent_configuration_filename}"
 }
 
 

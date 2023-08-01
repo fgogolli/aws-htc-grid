@@ -13,7 +13,7 @@ resource "kubernetes_cluster_role" "lambda_cluster_access" {
     resources  = ["pods", "pods/eviction", "nodes"]
   }
   depends_on = [
-      module.eks
+    module.eks
   ]
 }
 
@@ -33,7 +33,7 @@ resource "kubernetes_cluster_role_binding" "lambda_user_cluster_role_binding" {
     name      = "lambda-cluster-access"
   }
   depends_on = [
-      module.eks
+    module.eks
   ]
 }
 

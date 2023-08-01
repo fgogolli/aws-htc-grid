@@ -1,4 +1,4 @@
 
-clusterName: ${eks_cluster_id}
+# clusterName: ${cluster_name}
 image:
   repository: ${aws_htc_ecr}/ecr-public/cloudwatch-agent/cloudwatch-agent

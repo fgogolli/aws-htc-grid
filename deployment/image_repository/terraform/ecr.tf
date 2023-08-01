@@ -8,11 +8,11 @@ data "aws_caller_identity" "current" {}
 # create all ECR repository
 resource "aws_ecr_repository" "third_party" {
   count = length(var.repository)
-  name = var.repository[count.index]
+  name  = var.repository[count.index]
 }
 
 # authenticate to ECR repository
-resource "null_resource" "authenticate_to_ecr_repository"{
+resource "null_resource" "authenticate_to_ecr_repository" {
   triggers = {
     always_run = timestamp()
   }
@@ -31,7 +31,7 @@ resource "aws_ecr_pull_through_cache_rule" "quay" {
   upstream_registry_url = "quay.io"
 }
 
-resource null_resource "pull_python_env" {
+resource "null_resource" "pull_python_env" {
   triggers = {
     always_run = timestamp()
   }
@@ -48,7 +48,7 @@ resource null_resource "pull_python_env" {
 resource "null_resource" "copy_image" {
   for_each = var.image_to_copy
   triggers = {
-    state = "${each.key}-${each.value}",
+    state      = "${each.key}-${each.value}",
     always_run = timestamp()
   }
   provisioner "local-exec" {
@@ -58,14 +58,14 @@ resource "null_resource" "copy_image" {
       echo "cannot download image ${each.key}"
       exit 1
     fi
-    if ! docker tag ${each.key} ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":",each.value)[0]}:${length(split(":",each.value)) == 2 ? split(":",each.value)[1] : split(":",each.key)[1]}
+    if ! docker tag ${each.key} ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":", each.value)[0]}:${length(split(":", each.value)) == 2 ? split(":", each.value)[1] : split(":", each.key)[1]}
     then
-      echo "cannot tag ${each.key} to ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":",each.value)[0]}:${length(split(":",each.value)) == 2 ? split(":",each.value)[1] : split(":",each.key)[1]}"
+      echo "cannot tag ${each.key} to ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":", each.value)[0]}:${length(split(":", each.value)) == 2 ? split(":", each.value)[1] : split(":", each.key)[1]}"
       exit 1
     fi
-    if ! docker push ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":",each.value)[0]}:${length(split(":",each.value)) == 2 ? split(":",each.value)[1] : split(":",each.key)[1]}
+    if ! docker push ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":", each.value)[0]}:${length(split(":", each.value)) == 2 ? split(":", each.value)[1] : split(":", each.key)[1]}
     then
-      echo "echo cannot push ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":",each.value)[0]}:${length(split(":",each.value)) == 2 ? split(":",each.value)[1] : split(":",each.key)[1]}"
+      echo "echo cannot push ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${split(":", each.value)[0]}:${length(split(":", each.value)) == 2 ? split(":", each.value)[1] : split(":", each.key)[1]}"
       exit 1
     fi
   EOT

@@ -1,7 +1,7 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
- 
+
 
 
 resource "kubernetes_namespace" "influxdb" {
@@ -28,28 +28,28 @@ resource "helm_release" "influxdb" {
   }
 
   set {
-    name = "image.repository"
+    name  = "image.repository"
     value = "${var.aws_htc_ecr}/influxdb"
   }
 
   set {
-    name = "image.tag"
+    name  = "image.tag"
     value = "1.8.6-alpine"
   }
 
   set {
-    name = "service.type"
+    name  = "service.type"
     value = "LoadBalancer"
   }
 
   set {
-    type = "string"
-    name = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-internal"
+    type  = "string"
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-internal"
     value = "true"
   }
   set {
-    type = "string"
-    name = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
+    type  = "string"
+    name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
     value = "nlb"
   }
 
@@ -66,7 +66,7 @@ resource "helm_release" "influxdb" {
 
 data "kubernetes_service" "influxdb_load_balancer" {
   metadata {
-    name = "influxdb"
+    name      = "influxdb"
     namespace = "influxdb"
   }
   depends_on = [

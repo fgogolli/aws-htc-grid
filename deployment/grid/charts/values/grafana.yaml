@@ -22,7 +22,7 @@ persistence:
 service:
   type: "NodePort"
 
-
+adminPassword: "${grafana_configuration_admin_password}"
 
 nodeSelector:
   grid/type: "Operator"

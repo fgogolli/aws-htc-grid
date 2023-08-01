@@ -9,17 +9,17 @@ output "agent_config" {
 
 output "public_api_endpoint" {
   description = "Public API endpoint for the HTC grid"
-  value = module.control_plane.public_api_gateway_url
+  value       = module.control_plane.public_api_gateway_url
 }
 
 output "private_api_endpoint" {
   description = "Private API endpoint for the HTC grid"
-  value = module.control_plane.private_api_gateway_url
+  value       = module.control_plane.private_api_gateway_url
 }
 
 output "user_pool_arn" {
   description = "ARN of the user pool created"
-  value = module.compute_plane.cognito_userpool_arn
+  value       = module.compute_plane.cognito_userpool_arn
 }
 
 output "grafana_admin_password" {
@@ -30,10 +30,15 @@ output "grafana_admin_password" {
 
 output "user_pool_id" {
   description = "Userpool id of the user pool created"
-  value = module.compute_plane.cognito_userpool_id
+  value       = module.compute_plane.cognito_userpool_id
 }
 
 output "user_pool_client_id" {
   description = "Client id of the user pool created"
-  value = module.compute_plane.cognito_userpool_client_id
+  value       = module.compute_plane.cognito_userpool_client_id
+}
+
+output "compute_plane_outputs" {
+  description = "Compute Plans Outputs"
+  value       = module.compute_plane
 }

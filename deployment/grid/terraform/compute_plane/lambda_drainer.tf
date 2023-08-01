@@ -23,7 +23,7 @@ module "lambda_drainer" {
   environment_variables = {
       CLUSTER_NAME=var.cluster_name
   }
-   tags = {
+  tags = {
     service     = "htc-aws"
   }
   runtime     = var.lambda_runtime
@@ -37,7 +37,7 @@ module "lambda_drainer" {
 
 
 resource "aws_iam_role" "role_lambda_drainer" {
-  name = "role_lambda_drainer-${local.suffix}"
+  name               = "role_lambda_drainer-${local.suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -55,13 +55,11 @@ resource "aws_iam_role" "role_lambda_drainer" {
 EOF
 }
 
-
-
 resource "aws_autoscaling_lifecycle_hook" "drainer_hook" {
-  count = length( var.eks_worker_groups)
+  count = length(var.eks_worker_groups)
   #name  = var.user_names[count.index]
   name                   = var.eks_worker_groups[count.index].node_group_name
-  autoscaling_group_name = module.eks.self_managed_node_group_autoscaling_groups[count.index]
+  autoscaling_group_name = module.eks.eks_managed_node_groups_autoscaling_group_names[count.index]
   default_result         = "ABANDON"
   heartbeat_timeout      = var.graceful_termination_delay
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
@@ -70,7 +68,7 @@ resource "aws_autoscaling_lifecycle_hook" "drainer_hook" {
 
 
 resource "aws_cloudwatch_event_rule" "lifecycle_hook_event_rule" {
-  count = length( var.eks_worker_groups)
+  count = length(var.eks_worker_groups)
   name                = "event-lifecyclehook-${count.index}-${local.suffix}"
   description         = "Fires event when an EC2 instance is terminated"
   event_pattern = <<EOF
@@ -83,7 +81,7 @@ resource "aws_cloudwatch_event_rule" "lifecycle_hook_event_rule" {
   ],
   "detail": {
     "AutoScalingGroupName": [
-      "${module.eks.self_managed_node_group_autoscaling_groups[count.index+1]}"
+      "${module.eks.eks_managed_node_groups_autoscaling_group_names[count.index]}"
     ]
   }
 }
@@ -91,7 +89,7 @@ EOF
 }
 
 resource "aws_cloudwatch_event_target" "terminate_instance_event" {
-  count = length( var.eks_worker_groups)
+  count = length(var.eks_worker_groups)
   rule      = "event-lifecyclehook-${count.index}-${local.suffix}"
   target_id = "lambda"
   #arn       = aws_lambda_function.drainer.arn
@@ -102,7 +100,7 @@ resource "aws_cloudwatch_event_target" "terminate_instance_event" {
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_drainer" {
-  count = length( aws_cloudwatch_event_rule.lifecycle_hook_event_rule)
+  count = length(aws_cloudwatch_event_rule.lifecycle_hook_event_rule)
   statement_id  = "AllowDrainerExecutionFromCloudWatch-${count.index}"
   action        = "lambda:InvokeFunction"
   #function_name = aws_lambda_function.drainer.function_name
@@ -125,13 +123,13 @@ data "aws_iam_policy_document" "lambda_drainer_policy_document" {
     effect = "Allow"
 
     actions = [
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "autoscaling:CompleteLifecycleAction",
-        "ec2:DescribeInstances",
-        "eks:DescribeCluster",
-        "sts:GetCallerIdentity"
+      "ec2:CreateNetworkInterface",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "autoscaling:CompleteLifecycleAction",
+      "ec2:DescribeInstances",
+      "eks:DescribeCluster",
+      "sts:GetCallerIdentity"
     ]
 
     resources = ["*"]

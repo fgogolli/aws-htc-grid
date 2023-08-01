@@ -4,21 +4,21 @@
 
 variable "region" {
   description = "the region where the ECR repository will be created"
-  default = "eu-west-1"
+  default     = "eu-west-1"
 }
 
 variable "image_to_copy" {
   description = "contains the list of third party images to copy (and where to copy them)"
-  type = map
+  type        = map(any)
 }
 
 variable "repository" {
   description = "contains the list of ECR repository to create"
-  type =  list
+  type        = list(any)
 }
 
 variable "lambda_runtime" {
   description = "runtime used for the custom worker"
-  default = "python3.7"
-  type =  string
+  default     = "python3.7"
+  type        = string
 }
