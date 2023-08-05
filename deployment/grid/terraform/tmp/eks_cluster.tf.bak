@@ -129,12 +129,12 @@ module "eks" {
 #      min_size            = 2,
 #      max_size           = 5,
 #      desired_size = 2,
-#      kubelet_extra_args = "--node-labels=grid/type=Operator --register-with-taints=grid/type=Operator:NoSchedule"
-#      k8s_taints = [{key= "grid/type", value="Operator", effect="NO_SCHEDULE"}]
+#      kubelet_extra_args = "--node-labels=htc/node-type=core --register-with-taints=htc/node-type=core:NoSchedule"
+#      k8s_taints = [{key= "htc/node-type", value="core", effect="NO_SCHEDULE"}]
 #
 #      # Node Labels can be applied through EKS API or through Bootstrap script using kubelet_extra_args
 #      k8s_labels = {
-#        "grid/type" = "Operator"
+#        "htc/node-type" = "core"
 #      }
 #    }
 #  }
@@ -240,7 +240,7 @@ module "eks_blueprints_kubernetes_addons" {
   enable_aws_load_balancer_control = true
   aws_load_balancer_control_helm_config = {
     service_account = "aws-lb-sa"
-    values = [templatefile("${path.module}/../../charts/values/aws-alb-Operator.yaml", {
+    values = [templatefile("${path.module}/../../charts/values/aws-alb-core.yaml", {
       region = var.region
       eks_cluster_id =  module.eks.eks_cluster_id
     })]
@@ -277,7 +277,7 @@ module "eks_blueprints_kubernetes_addons" {
 
   #aws_load_balancer_control = {
   #  service_account = "aws-lb-sa"
-  #  values = [templatefile("${path.module}/../../charts/values/aws-alb-Operator.yaml", {
+  #  values = [templatefile("${path.module}/../../charts/values/aws-alb-core.yaml", {
   #    region = var.region
   #    eks_cluster_id =  module.eks.eks_cluster_id
   #  })]

@@ -10,7 +10,7 @@ locals {
     for index in range(0, length(var.eks_worker_groups)) :
     merge(var.eks_worker_groups[index], {
       launch_template_os = "amazonlinux2eks"
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=grid/type=worker'"
+      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=htc/node-type=worker'"
       tags = {
         "aws-node-termination-handler/managed"          = "true"
         "k8s.io/cluster-autoscaler/enabled"             = "true"
@@ -28,7 +28,7 @@ locals {
       max_size             = 6,
       desired_size         = 4,
       launch_template_os   = "amazonlinux2eks"
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=grid/type=Operator --register-with-taints=grid/type=Operator:NoSchedule'"
+      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=htc/node-type=core --register-with-taints=htc/node-type=core:NoSchedule'"
     }
   ])
   

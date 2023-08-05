@@ -24,9 +24,9 @@ module "eks" {
   #     configuration_values = jsonencode({
   #       tolerations: [
   #         {
-  #           key: "grid/type",
+  #           key: "htc/node-type",
   #           operator: "Equal",
-  #           value: "Operator",
+  #           value: "core",
   #           effect: "NoSchedule"
   #         }
   #       ]
@@ -302,9 +302,9 @@ module "eks_blueprints_addons" {
         {
           tolerations: [
             {
-              key: "grid/type",
+              key: "htc/node-type",
               operator: "Equal",
-              value: "Operator",
+              value: "core",
               effect: "NoSchedule"
             }
           ]

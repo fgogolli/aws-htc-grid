@@ -16,12 +16,12 @@ server:
   persistentVolume:
     enabled: false
   tolerations:
-    - key: "grid/type"
+    - key: "htc/node-type"
       operator: "Equal"
-      value: "Operator"
+      value: "core"
       effect: "NoSchedule"
   nodeSelector:
-    grid/type: "Operator"
+    htc/node-type: "core"
 
 alertmanager:
   enabled: false
@@ -39,12 +39,12 @@ kube-state-metrics:
       cpu: 200m
       memory: 512Mi
   tolerations:
-    - key: "grid/type"
+    - key: "htc/node-type"
       operator: "Equal"
-      value: "Operator"
+      value: "core"
       effect: "NoSchedule"
   nodeSelector:
-    grid/type: "Operator"
+    htc/node-type: "core"
 
 pushgateway:
   enabled: false
@@ -60,12 +60,12 @@ nodeExporter:
       cpu: 200m
       memory: 512Mi
   tolerations:
-    - key: "grid/type"
+    - key: "htc/node-type"
       operator: "Equal"
-      value: "Operator"
+      value: "core"
       effect: "NoSchedule"
   nodeSelector:
-    grid/type: "Operator"
+    htc/node-type: "core"
 
 
 configmapReload:

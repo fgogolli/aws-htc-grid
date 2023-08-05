@@ -8,9 +8,9 @@ image:
   repository: ${aws_htc_ecr}/ecr-public/aws-ec2/aws-node-termination-handler
 
 tolerations:
-  - key: "grid/type"
+  - key: "htc/node-type"
     operator: "Equal"
-    value: "Operator"
+    value: "core"
     effect: "NoSchedule"
 
 rbac:
