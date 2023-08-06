@@ -4,13 +4,18 @@
 
 locals {
   # check if var.suffix is empty then create a random suffix else use var.suffix
-  suffix = var.suffix != "" ? var.suffix : random_string.random_resources.result
+  suffix = var.suffix != "" ? var.suffix : random_string.random.result
 
   eks_worker_group = concat([
     for index in range(0, length(var.eks_worker_groups)) :
     merge(var.eks_worker_groups[index], {
-      launch_template_os = "amazonlinux2eks"
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=htc/node-type=worker'"
+      # launch_template_os = "amazonlinux2eks"
+      # bootstrap_extra_args = "--kubelet-extra-args '--node-labels=htc/node-type=worker'"
+  
+      labels = {
+        "htc/node-type" = "worker"
+      }
+  
       tags = {
         "aws-node-termination-handler/managed"          = "true"
         "k8s.io/cluster-autoscaler/enabled"             = "true"
@@ -18,17 +23,29 @@ locals {
     } })
     ], [
     {
-      node_group_name = "operator-ondemand",
-      instance_types  = ["m6a.2xlarge", "m6i.2xlarge", "m6idn.2xlarge", "m6in.2xlarge", "m5.2xlarge"],
+      node_group_name = "core-ondemand",
+      # instance_types  = ["m6a.2xlarge", "m6i.2xlarge", "m6idn.2xlarge", "m6in.2xlarge", "m5.2xlarge"],
       capacity_type   = "ON_DEMAND",
       iam_role_additional_policies = {
         agent_permissions = aws_iam_policy.agent_permissions.arn
       }
-      min_size             = 4,
+      min_size             = 2,
       max_size             = 6,
-      desired_size         = 4,
-      launch_template_os   = "amazonlinux2eks"
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=htc/node-type=core --register-with-taints=htc/node-type=core:NoSchedule'"
+      desired_size         = 2,
+      # launch_template_os   = "amazonlinux2eks"
+      # bootstrap_extra_args = "--kubelet-extra-args '--node-labels=htc/node-type=core --register-with-taints=htc/node-type=core:NoSchedule'"
+
+      labels = {
+        "htc/node-type" = "core"
+      }
+  
+      taints = [
+        {
+          key    = "htc/node-type"
+          value  = "core"
+          effect = "NO_SCHEDULE"
+        }
+      ]
     }
   ])
   
@@ -40,7 +57,7 @@ locals {
   eks_worker_group_map = zipmap(local.eks_worker_group_name, local.eks_worker_group)
 }
 
-resource "random_string" "random_resources" {
+resource "random_string" "random" {
   length  = 10
   special = false
   upper   = false
@@ -48,3 +65,52 @@ resource "random_string" "random_resources" {
 }
 
 data "aws_caller_identity" "current" {}
+
+
+################################################################################
+# Tags for the ASG to support cluster-autoscaler scale up from 0
+################################################################################
+
+locals {
+  # We need to lookup K8s taint effect from the AWS API value
+  taint_effects = {
+    NO_SCHEDULE        = "NoSchedule"
+    NO_EXECUTE         = "NoExecute"
+    PREFER_NO_SCHEDULE = "PreferNoSchedule"
+  }
+
+  cluster_autoscaler_label_tags = merge([
+    for name, group in module.eks.eks_managed_node_groups : {
+      for label_name, label_value in coalesce(group.node_group_labels, {}) : "${name}|label|${label_name}" => {
+        autoscaling_group = group.node_group_autoscaling_group_names[0],
+        key               = "k8s.io/cluster-autoscaler/node-template/label/${label_name}",
+        value             = label_value,
+      }
+    }
+  ]...)
+
+  cluster_autoscaler_taint_tags = merge([
+    for name, group in module.eks.eks_managed_node_groups : {
+      for taint in coalesce(group.node_group_taints, []) : "${name}|taint|${taint.key}" => {
+        autoscaling_group = group.node_group_autoscaling_group_names[0],
+        key               = "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}"
+        value             = "${taint.value}:${local.taint_effects[taint.effect]}"
+      }
+    }
+  ]...)
+
+  cluster_autoscaler_asg_tags = merge(local.cluster_autoscaler_label_tags, local.cluster_autoscaler_taint_tags)
+}
+
+resource "aws_autoscaling_group_tag" "cluster_autoscaler_label_tags" {
+  for_each = local.cluster_autoscaler_asg_tags
+
+  autoscaling_group_name = each.value.autoscaling_group
+
+  tag {
+    key   = each.value.key
+    value = each.value.value
+
+    propagate_at_launch = false
+  }
+}

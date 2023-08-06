@@ -51,102 +51,134 @@ module "vpc" {
 }
 
 module "vpc_endpoints" {
-  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "~> 5.0"
 
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.vpc.default_security_group_id]
   create = true
 
-  endpoints = {
-    sts = {
-      service = "sts"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    sqs = {
-      service = "sqs"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    s3 = {
-      service = "s3"
-      service_type    = "Gateway"
-      route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
-    }
-    dynamodb = {
-      service = "dynamodb"
-      service_type    = "Gateway"
-      route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
-    }
-    ec2_autoscaling = {
-      service = "autoscaling"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    ec2 = {
-      service = "ec2"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    ecr_dkr = {
-      service = "ecr.dkr"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    ecr_api = {
-      service = "ecr.api"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    monitoring = {
-      service = "monitoring"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-    logs = {
-      service = "logs"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-
-    elasticloadbalancing = {
-      service = "elasticloadbalancing"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-
-    api_gateway = {
-      service = "execute-api"
-      private_dns_enabled = true
-      subnet_ids =  module.vpc.private_subnets
-      security_group_ids =  [module.vpc.default_security_group_id]
-    }
-
-    ssm = {
-      service = "ssm"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-
-    ssmmessages = {
-      service = "ssmmessages"
-      private_dns_enabled = var.enable_private_subnet
-      subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
-      security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
-    }
-  }
+  endpoints = merge({
+      s3 = {
+        service         = "s3"
+        service_type    = "Gateway"
+        route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+      }
+      dynamodb = {
+        service         = "dynamodb"
+        service_type    = "Gateway"
+        route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+      }
+    },
+    { for service in toset(["autoscaling", "ecr.api", "ecr.dkr", "ec2", "elasticloadbalancing", "eks", "execute-api", "logs", "monitoring", "sqs", "sts", "ssm", "ssmmessages"]) :
+      replace(service, ".", "_") =>
+      {
+        service             = service
+        private_dns_enabled = var.enable_private_subnet
+        subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+        security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+      }
+  })
 }
+
+
+# module "vpc_endpoints" {
+#   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+#   version = "~> 5.0"
+
+#   vpc_id             = module.vpc.vpc_id
+#   security_group_ids = [module.vpc.default_security_group_id]
+#   create = true
+
+#   endpoints = {
+#     sts = {
+#       service = "sts"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     sqs = {
+#       service = "sqs"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     s3 = {
+#       service = "s3"
+#       service_type    = "Gateway"
+#       route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+#     }
+#     dynamodb = {
+#       service = "dynamodb"
+#       service_type    = "Gateway"
+#       route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+#     }
+#     ec2_autoscaling = {
+#       service = "autoscaling"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     ec2 = {
+#       service = "ec2"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     ecr_dkr = {
+#       service = "ecr.dkr"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     ecr_api = {
+#       service = "ecr.api"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     monitoring = {
+#       service = "monitoring"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#     logs = {
+#       service = "logs"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+
+#     elasticloadbalancing = {
+#       service = "elasticloadbalancing"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+
+#     api_gateway = {
+#       service = "execute-api"
+#       private_dns_enabled = true
+#       subnet_ids =  module.vpc.private_subnets
+#       security_group_ids =  [module.vpc.default_security_group_id]
+#     }
+
+#     ssm = {
+#       service = "ssm"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+
+#     ssmmessages = {
+#       service = "ssmmessages"
+#       private_dns_enabled = var.enable_private_subnet
+#       subnet_ids = var.enable_private_subnet == true ? module.vpc.private_subnets : []
+#       security_group_ids = var.enable_private_subnet == true ? [module.vpc.default_security_group_id] : []
+#     }
+#   }
+# }
 
 
 
@@ -163,12 +195,12 @@ resource "aws_security_group_rule" "https" {
   security_group_id = module.vpc.default_security_group_id
 }
 
-# resource "aws_security_group_rule" "egress_rule" {
-#   type              = "egress"
-#   from_port        = 0
-#   to_port          = 0
-#   protocol         = "-1"
-#   cidr_blocks      = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks = ["::/0"]
-#   security_group_id = module.vpc.default_security_group_id
-# }
+resource "aws_security_group_rule" "egress_rule" {
+  type              = "egress"
+  from_port        = 0
+  to_port          = 0
+  protocol         = "-1"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+  security_group_id = module.vpc.default_security_group_id
+}

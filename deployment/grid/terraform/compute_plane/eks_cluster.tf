@@ -52,13 +52,14 @@ module "eks" {
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"
-    instance_types = ["m6a.2xlarge", "m6i.2xlarge", "m6idn.2xlarge", "m6in.2xlarge", "m5.2xlarge"]
-    attach_cluster_primary_security_group = true
+    instance_types = ["m6a.xlarge", "m6i.xlarge", "m6idn.xlarge", "m6in.xlarge", "m5.xlarge"]
+    attach_cluster_primary_security_group = false
   }
 
   eks_managed_node_groups = local.eks_worker_group_map
 
-  # create_node_security_group    = false
+  //create_cluster_security_group = false
+  //create_node_security_group    = true
   node_security_group_additional_rules = {
     # keda_metrics_server_access = {
     #   description                   = "Cluster access to keda metrics"
@@ -296,10 +297,15 @@ module "eks_blueprints_addons" {
     
     coredns = {
       resolve_conflicts_on_create = "OVERWRITE"
-      resolve_conflicts_on_update = "PRESERVE"
+      resolve_conflicts_on_update = "OVERWRITE"
+      preserve                    = false
       most_recent                 = true
       configuration_values = jsonencode(
         {
+          replicaCount: 2,
+          nodeSelector: {
+              "htc/node-type": "core"
+          },
           tolerations: [
             {
               key: "htc/node-type",
@@ -397,6 +403,7 @@ module "eks_blueprints_addons" {
     values = [templatefile("${path.module}/../../charts/values/aws-alb-controller.yaml", {
       cluster_name = module.eks.cluster_name
       region       = var.region
+      vpc_id        = var.vpc_id
     })]
   }
 
@@ -495,16 +502,16 @@ module "eks_blueprints_addons" {
 #   }
 # }
 
-module "htc_agent_irsa" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/irsa?ref=v4.32.1"
-  create_kubernetes_namespace = false
-  create_kubernetes_service_account = true
-  eks_cluster_id = module.eks.cluster_name
-  eks_oidc_provider_arn = module.eks.oidc_provider_arn
-  irsa_iam_policies = [aws_iam_policy.agent_permissions.arn]
-  kubernetes_namespace = "default"
-  kubernetes_service_account = "htc-agent-sa"
-}
+# module "htc_agent_irsa" {
+#   source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/irsa?ref=v4.32.1"
+#   create_kubernetes_namespace = false
+#   create_kubernetes_service_account = true
+#   eks_cluster_id = module.eks.cluster_name
+#   eks_oidc_provider_arn = module.eks.oidc_provider_arn
+#   irsa_iam_policies = [aws_iam_policy.agent_permissions.arn]
+#   kubernetes_namespace = "default"
+#   kubernetes_service_account = "htc-agent-sa"
+# }
 
 # data "local_file" "patch_core_dns" {
 #   filename = "${path.module}/patch-toleration-selector.yaml"

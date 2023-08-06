@@ -24,6 +24,22 @@ variable "agent_image_tag" {
   description = "tag associated to the agent image"
 }
 
+variable "agent_permissions_policy_arn" {
+  type = string
+  description = "IAM Policy ARN for HTC Agent IRSA Permissions"
+}
+
+variable "suffix" {
+  default     = ""
+  description = "suffix for generating unique name for AWS resource"
+}
+
+
+variable "eks_oidc_provider_arn" {
+  type = string
+  description = "EKS Cluster OIDC Provider ARN for IRSA Permissions"
+}
+
 variable "test_agent_image_repository" {
   type = string
   description = "repository of the test agent image"

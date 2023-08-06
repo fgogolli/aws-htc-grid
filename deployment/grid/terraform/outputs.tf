@@ -38,7 +38,7 @@ output "user_pool_client_id" {
   value       = module.compute_plane.cognito_userpool_client_id
 }
 
-output "compute_plane_outputs" {
-  description = "Compute Plans Outputs"
-  value       = module.compute_plane
-}
+# output "compute_plane_outputs" {
+#   description = "Compute Plans Outputs"
+#   value       = module.compute_plane
+# }

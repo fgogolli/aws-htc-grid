@@ -8,7 +8,6 @@ resource "tls_private_key" "alb_certificate" {
 }
 
 
-
 resource "tls_self_signed_cert" "alb_certificate" {
   private_key_pem = tls_private_key.alb_certificate.private_key_pem
 
@@ -36,6 +35,7 @@ resource "tls_self_signed_cert" "alb_certificate" {
   }
 }
 
+
 # For example, this can be used to populate an AWS IAM server certificate.
 resource "aws_iam_server_certificate" "alb_certificate" {
   name             = "alb_certificate_self_signed_cert-${local.suffix}"
@@ -59,8 +59,6 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
       "alb.ingress.kubernetes.io/subnets"              = join(",", var.vpc_public_subnet_ids)
     }
   }
-
-
 
   spec {
     rule {
@@ -116,6 +114,7 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
   }
 }
 
+
 resource "kubernetes_config_map" "dashboard" {
   metadata {
     namespace = "grafana"
@@ -138,4 +137,3 @@ resource "kubernetes_config_map" "dashboard" {
   ]
 
 }
-

@@ -220,7 +220,10 @@ module "htc_agent" {
   get_layer_image_tag                = lookup(lookup(var.agent_configuration, "get_layer", local.default_agent_configuration.get_layer), "tag", local.default_agent_configuration.get_layer.tag)
   lambda_image_tag                   = lookup(lookup(var.agent_configuration, "lambda", local.default_agent_configuration.lambda), "runtime", local.default_agent_configuration.lambda.runtime)
   test_agent_image_tag               = lookup(lookup(var.agent_configuration, "test", local.default_agent_configuration.test), "tag", local.default_agent_configuration.test.tag)
+  suffix                             = local.project_name
   agent_name                         = var.htc_agent_name
+  agent_permissions_policy_arn       = module.compute_plane.agent_permissions_policy_arn
+  eks_oidc_provider_arn              = module.compute_plane.oidc_provider_arn
   max_htc_agents                     = var.max_htc_agents
   min_htc_agents                     = var.min_htc_agents
   htc_agent_target_value             = var.htc_agent_target_value

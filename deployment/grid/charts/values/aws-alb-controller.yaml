@@ -3,6 +3,11 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 # clusterName: ${cluster_name}
 region: ${region}
+vpcId: ${vpc_id}
+
+podDisruptionBudget:
+  maxUnavailable: 1
+
 logLevel: "debug"
 enableShield: false
 enableWaf: false

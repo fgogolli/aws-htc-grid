@@ -3,7 +3,7 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
 locals {
-  cognito_domain_name = replace("${lower(var.suffix)}-${random_string.random_resources.result}", "aws", "")
+  cognito_domain_name = replace("${lower(var.suffix)}-${random_string.random.result}", "aws", "")
 }
 
 resource "aws_cognito_user_pool" "htc_pool" {

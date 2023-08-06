@@ -39,7 +39,7 @@ variable "lambda_runtime" {
 }
 
 variable "cwa_version" {
-  description = "Cloud Watch Adapter for kubernetes version"
+  description = "CloudWatch Adapter for Kubernetes version"
 }
 
 variable "aws_node_termination_handler_version" {

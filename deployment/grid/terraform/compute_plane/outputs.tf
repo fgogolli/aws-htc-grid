@@ -69,3 +69,8 @@ output "cognito_userpool_client_id" {
   description = "url of the NLB in front of the influx DB"
   value       = aws_cognito_user_pool_client.user_data_client.id
 }
+
+output "agent_permissions_policy_arn" {
+  description = "OIDC Provider ARN for the EKS Cluster"
+  value       = aws_iam_policy.agent_permissions.arn
+}

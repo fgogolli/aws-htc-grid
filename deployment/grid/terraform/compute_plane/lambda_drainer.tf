@@ -2,13 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
-
-
-
 # Create zip-archive of a single directory where "pip install" will also be executed (default for python runtime)
 module "lambda_drainer" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "4.6.1"
+
   source_path = "../../../source/compute_plane/python/lambda/drainer"
   function_name =  "lambda_drainer-${local.suffix}"
   handler = "handler.lambda_handler"
@@ -55,6 +53,7 @@ resource "aws_iam_role" "role_lambda_drainer" {
 EOF
 }
 
+
 resource "aws_autoscaling_lifecycle_hook" "drainer_hook" {
   count = length(var.eks_worker_groups)
   #name  = var.user_names[count.index]
@@ -63,7 +62,6 @@ resource "aws_autoscaling_lifecycle_hook" "drainer_hook" {
   default_result         = "ABANDON"
   heartbeat_timeout      = var.graceful_termination_delay
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
-
 }
 
 
@@ -88,6 +86,7 @@ resource "aws_cloudwatch_event_rule" "lifecycle_hook_event_rule" {
 EOF
 }
 
+
 resource "aws_cloudwatch_event_target" "terminate_instance_event" {
   count = length(var.eks_worker_groups)
   rule      = "event-lifecyclehook-${count.index}-${local.suffix}"
@@ -98,6 +97,7 @@ resource "aws_cloudwatch_event_target" "terminate_instance_event" {
     aws_cloudwatch_event_rule.lifecycle_hook_event_rule
   ]
 }
+
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_drainer" {
   count = length(aws_cloudwatch_event_rule.lifecycle_hook_event_rule)
@@ -116,7 +116,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_drainer" {
 # }
 
 
-#Agent permissions
+#Lambda Drainer permissions
 data "aws_iam_policy_document" "lambda_drainer_policy_document" {
   statement {
     sid    = ""
@@ -136,6 +136,7 @@ data "aws_iam_policy_document" "lambda_drainer_policy_document" {
   }
 }
 
+
 resource "aws_iam_policy" "lambda_drainer_policy" {
   name_prefix = "lambda-drainer-policy"
   description = "Policy for draining  nodes of an EKS cluster"
@@ -147,6 +148,7 @@ resource "aws_iam_role_policy_attachment" "lambda_drainer_basic_policy_attachmen
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   role       = aws_iam_role.role_lambda_drainer.name
 }
+
 
 resource "aws_iam_role_policy_attachment" "lambda_drainer_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_drainer_policy.arn
