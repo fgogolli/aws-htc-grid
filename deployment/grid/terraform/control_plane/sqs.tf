@@ -2,11 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
-variable "priorities" {
-  default = {
-    "__0" = 0
-  }
-}
+
 resource "aws_sqs_queue" "htc_task_queue" {
   for_each = var.priorities
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 module "dynamodb_table" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "3.1.2"
@@ -42,8 +43,6 @@ module "dynamodb_table" {
       type = "S"
     },
 
-
-
     #  {
     #   name = "task_owner"
     #   type = "S"
@@ -74,10 +73,7 @@ module "dynamodb_table" {
     #   name = "parent_session_id"
     #   type = "S"
     # }
-
   ]
-
-
 
   global_secondary_indexes = [
     {
@@ -100,7 +96,6 @@ module "dynamodb_table" {
     }
 
   ]
-
 
   autoscaling_read = {
     scale_in_cooldown  = 300

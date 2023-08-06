@@ -158,6 +158,7 @@ variable "vpc_id" {
 variable "vpc_cidr" {
   description = "Default VPC CIDR"
 }
+
 variable "nlb_influxdb" {
   description = "network load balancer url  in front of influxdb"
   default     = ""
@@ -181,4 +182,10 @@ variable "state_table_service" {
 
 variable "state_table_config" {
   description = "State Table configuration"
+}
+
+variable "priorities" {
+  default = {
+    "__0" = 0
+  }
 }

@@ -142,3 +142,39 @@ resource "aws_iam_role_policy_attachment" "lambda_drainer_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_drainer_policy.arn
   role       = aws_iam_role.role_lambda_drainer.name
 }
+
+
+#Lambda Drainer EKS Access
+resource "kubernetes_cluster_role" "lambda_cluster_access" {
+  metadata {
+    name = "lambda-cluster-access"
+  }
+
+  rule {
+    verbs      = ["create", "list", "patch"]
+    api_groups = [""]
+    resources  = ["pods", "pods/eviction", "nodes"]
+  }
+
+  depends_on = [module.eks]
+}
+
+
+resource "kubernetes_cluster_role_binding" "lambda_user_cluster_role_binding" {
+  metadata {
+    name = "lambda-user-cluster-role-binding"
+  }
+
+  subject {
+    kind = "User"
+    name = "lambda"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "lambda-cluster-access"
+  }
+
+  depends_on = [module.eks]
+}

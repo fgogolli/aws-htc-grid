@@ -50,6 +50,7 @@ resource "aws_lambda_permission" "openapi_htc_grid_apigw_public_lambda_permissio
   source_arn = "${aws_api_gateway_rest_api.htc_grid_public_rest_api.execution_arn}/*/*"
 }
 
+
 resource "aws_lambda_permission" "openapi_htc_grid_public_apigw_lambda_permission_result" {
   statement_id  = "AllowPublicResultAPIGatewayInvoke-${local.suffix}"
   action        = "lambda:InvokeFunction"
@@ -61,6 +62,7 @@ resource "aws_lambda_permission" "openapi_htc_grid_public_apigw_lambda_permissio
   source_arn = "${aws_api_gateway_rest_api.htc_grid_public_rest_api.execution_arn}/*/*"
 }
 
+
 resource "aws_lambda_permission" "openapi_htc_grid_apigw_public_lambda_permission_cancel" {
   statement_id  = "AllowPublicCancelAPIGatewayInvoke-${local.suffix}"
   action        = "lambda:InvokeFunction"
@@ -71,5 +73,3 @@ resource "aws_lambda_permission" "openapi_htc_grid_apigw_public_lambda_permissio
   # within the API Gateway REST API.
   source_arn = "${aws_api_gateway_rest_api.htc_grid_public_rest_api.execution_arn}/*/*"
 }
-
-

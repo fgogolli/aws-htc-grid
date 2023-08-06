@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 resource "aws_elasticache_cluster" "stdin-stdout-cache" {
   cluster_id           = "stdin-stdout-cache-${lower(local.suffix)}"
   engine               = "redis"
@@ -17,6 +18,7 @@ resource "aws_elasticache_cluster" "stdin-stdout-cache" {
     aws_elasticache_subnet_group.io_redis_subnet_group
   ]
 }
+
 
 resource "aws_elasticache_subnet_group" "io_redis_subnet_group" {
   name       = "stdin-stdout-cache-subnet-${lower(local.suffix)}"
@@ -56,4 +58,3 @@ resource "aws_elasticache_parameter_group" "cache-config" {
   }
 
 }
-
