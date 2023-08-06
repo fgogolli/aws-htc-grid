@@ -30,22 +30,22 @@ Parameters:
   C9KubectlVersion:
     Description: kubectl Version to install on Cloud9
     Type: String
-    Default: v1.21.0
+    Default: v1.25.12
     ConstraintDescription: Must be a valid kubectl version
   C9TerraformVersion:
     Description: Terraform Version to install on Cloud9
     Type: String
-    Default: 1.0.0
+    Default: 1.5.4
     ConstraintDescription: Must be a valid terraform version
   C9EKSctlVersion:
     Description: Cloud9 instance eksctl version
     Type: String
-    Default: 0.43.0
+    Default: 0.150.0
     ConstraintDescription: Must be a valid eksctl version
   C9HelmVersion:
     Description: Helm Version to install on Cloud9
     Type: String
-    Default: v3.5.3
+    Default: v3.12.2
     ConstraintDescription: Must be a valid helm version
   HTCgridVersion:
     Description: HTC Grid Version to install on Cloud9
