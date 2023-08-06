@@ -2,20 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
-data "aws_caller_identity" "current" {}
-
-resource "random_string" "random_resources" {
-  length  = 5
-  special = false
-  upper   = false
-  # number = false
-}
-
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "_%@"
-}
 
 locals {
   aws_htc_ecr                = var.aws_htc_ecr != "" ? var.aws_htc_ecr : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com"
@@ -79,9 +65,28 @@ locals {
   }
 }
 
-module "vpc" {
 
-  source          = "./vpc"
+data "aws_caller_identity" "current" {}
+
+
+resource "random_string" "random_resources" {
+  length  = 5
+  special = false
+  upper   = false
+  # number = false
+}
+
+
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
+
+module "vpc" {
+  source = "./vpc"
+
   region          = var.region
   cluster_name    = local.cluster_name
   vpc_range       = 16
@@ -91,6 +96,7 @@ module "vpc" {
   enable_private_subnet = var.enable_private_subnet
 
 }
+
 
 module "compute_plane" {
   source = "./compute_plane"
@@ -133,9 +139,6 @@ module "compute_plane" {
   task_queue_config                    = var.task_queue_config
   error_log_group                      = local.error_log_group
   error_logging_stream                 = local.error_logging_stream
-  # depends_on  = [
-  #     module.vpc
-  # ]
 
   grafana_configuration = {
     downloadDashboardsImage_tag = var.grafana_configuration.downloadDashboardsImage_tag
@@ -205,9 +208,7 @@ module "control_plane" {
   api_gateway_version                           = var.api_gateway_version
 
 
-  # depends_on  = [
-  #     module.vpc
-  # ]
+  depends_on = [module.vpc]
 }
 
 
@@ -260,5 +261,4 @@ module "htc_agent" {
     module.vpc,
     kubernetes_config_map.htcagentconfig
   ]
-
 }

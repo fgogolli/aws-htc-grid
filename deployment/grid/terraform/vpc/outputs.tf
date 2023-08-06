@@ -5,12 +5,12 @@
 
 output "vpc_id" {
   description = "Id of the VPC created"
-  value       = data.aws_vpc.selected.id
+  value       = module.vpc.vpc_id
 }
 
 output "vpc_cidr_block" {
   description = "CIDR block of the VPC created"
-  value       = data.aws_vpc.selected.cidr_block
+  value       = module.vpc.vpc_cidr_block
 }
 
 output "private_subnet_ids" {

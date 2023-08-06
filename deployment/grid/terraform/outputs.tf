@@ -38,6 +38,11 @@ output "user_pool_client_id" {
   value       = module.compute_plane.cognito_userpool_client_id
 }
 
+output "grafana_ingress_domain" {
+  description = "Ingress Domain for Grafana"
+  value       = module.compute_plane.grafana_ingress_domain
+}
+
 # output "compute_plane_outputs" {
 #   description = "Compute Plans Outputs"
 #   value       = module.compute_plane

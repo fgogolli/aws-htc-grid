@@ -1,6 +1,8 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
+
+
 locals {
   agent_config = <<EOF
 {
@@ -68,27 +70,8 @@ resource "kubernetes_config_map" "htcagentconfig" {
   ]
 }
 
-#configmap with all the variables
-/* resource "kubernetes_config_map" "htcagentconfig_client" {
-  metadata {
-    name      = "agent-configmap"
-    namespace = "client"
-  }
-
-  data = {
-     "Agent_config.tfvars.json" = local.agent_config
-  }
-  depends_on = [
-    module.resources,
-    module.scheduler
-  ]
-} */
-
-
 
 resource "local_file" "agent_config_file" {
   content  = local.agent_config
   filename = "${path.module}/${var.agent_configuration_filename}"
 }
-
-

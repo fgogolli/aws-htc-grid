@@ -8,17 +8,17 @@ locals {
 
   eks_worker_group = concat([
     for index in range(0, length(var.eks_worker_groups)) :
-      merge(var.eks_worker_groups[index], {
-        labels = {
-          "htc/node-type" = "worker"
-        }
-  
-        tags = {
-          "aws-node-termination-handler/managed"          = "true"
-          "k8s.io/cluster-autoscaler/enabled"             = "true"
-          "k8s.io/cluster-autoscaler/${var.cluster_name}" = "true"
-        }
-      })
+    merge(var.eks_worker_groups[index], {
+      labels = {
+        "htc/node-type" = "worker"
+      }
+
+      tags = {
+        "aws-node-termination-handler/managed"          = "true"
+        "k8s.io/cluster-autoscaler/enabled"             = "true"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "true"
+      }
+    })
     ],
     [
       {
@@ -35,7 +35,7 @@ locals {
         labels = {
           "htc/node-type" = "core"
         }
-  
+
         taints = [
           {
             key    = "htc/node-type"

@@ -23,12 +23,6 @@ output "certificate_authority" {
   value       = module.eks.cluster_certificate_authority_data
 }
 
-# output "token" {
-#   description = "authentication token for EKS"
-#   value       = data.aws_eks_cluster_auth.cluster.token
-#   sensitive   = true
-# }
-
 output "eks_managed_node_groups" {
   description = "Map of EKS Managed Node Group outputs"
   value       = try(module.eks.eks_managed_node_groups, {})
@@ -55,21 +49,26 @@ output "nlb_influxdb" {
 }
 
 output "cognito_userpool_arn" {
-  description = "url of the NLB in front of the influx DB"
+  description = "Cognito User Pool ARN"
   value       = aws_cognito_user_pool.htc_pool.arn
 }
 
 output "cognito_userpool_id" {
-  description = "url of the NLB in front of the influx DB"
+  description = "Cognito User Pool ID"
   value       = aws_cognito_user_pool.htc_pool.id
 }
 
 output "cognito_userpool_client_id" {
-  description = "url of the NLB in front of the influx DB"
+  description = "Cognito User Pool Client ID"
   value       = aws_cognito_user_pool_client.user_data_client.id
 }
 
 output "agent_permissions_policy_arn" {
   description = "OIDC Provider ARN for the EKS Cluster"
   value       = aws_iam_policy.agent_permissions.arn
+}
+
+output "grafana_ingress_domain" {
+  description = "Ingress Domain for Grafana"
+  value       = "https://${kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname}"
 }

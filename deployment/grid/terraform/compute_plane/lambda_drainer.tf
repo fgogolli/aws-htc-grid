@@ -7,13 +7,13 @@ module "lambda_drainer" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "4.6.1"
 
-  source_path   = "../../../source/compute_plane/python/lambda/drainer"
-  function_name = "lambda_drainer-${local.suffix}"
-  handler       = "handler.lambda_handler"
-  memory_size   = 1024
-  timeout       = 900
-  create_role   = false
-  lambda_role   = aws_iam_role.role_lambda_drainer.arn
+  source_path     = "../../../source/compute_plane/python/lambda/drainer"
+  function_name   = "lambda_drainer-${local.suffix}"
+  handler         = "handler.lambda_handler"
+  memory_size     = 1024
+  timeout         = 900
+  create_role     = false
+  lambda_role     = aws_iam_role.role_lambda_drainer.arn
   runtime         = var.lambda_runtime
   build_in_docker = true
   docker_image    = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
@@ -42,7 +42,7 @@ resource "aws_autoscaling_lifecycle_hook" "drainer_hook" {
 
 
 resource "aws_cloudwatch_event_rule" "lifecycle_hook_event_rule" {
-  count         = length(var.eks_worker_groups)
+  count = length(var.eks_worker_groups)
 
   name          = "event-lifecyclehook-${count.index}-${local.suffix}"
   description   = "Fires event when an EC2 instance is terminated"
@@ -65,21 +65,21 @@ EOF
 
 
 resource "aws_cloudwatch_event_target" "terminate_instance_event" {
-  count     = length(var.eks_worker_groups)
+  count = length(var.eks_worker_groups)
 
   rule      = "event-lifecyclehook-${count.index}-${local.suffix}"
   target_id = "lambda"
-  arn = module.lambda_drainer.lambda_function_arn
+  arn       = module.lambda_drainer.lambda_function_arn
 
   depends_on = [aws_cloudwatch_event_rule.lifecycle_hook_event_rule]
 }
 
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_drainer" {
-  count        = length(aws_cloudwatch_event_rule.lifecycle_hook_event_rule)
+  count = length(aws_cloudwatch_event_rule.lifecycle_hook_event_rule)
 
-  statement_id = "AllowDrainerExecutionFromCloudWatch-${count.index}"
-  action       = "lambda:InvokeFunction"
+  statement_id  = "AllowDrainerExecutionFromCloudWatch-${count.index}"
+  action        = "lambda:InvokeFunction"
   function_name = module.lambda_drainer.lambda_function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.lifecycle_hook_event_rule[count.index].arn
