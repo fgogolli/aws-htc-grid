@@ -3,9 +3,9 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
 module "dynamodb_table" {
-  source = "terraform-aws-modules/dynamodb-table/aws"
+  source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "3.1.2"
-  name   = var.ddb_state_table
+  name    = var.ddb_state_table
 
   read_capacity  = var.dynamodb_billing_mode == "PROVISIONED" ? var.dynamodb_table_read_capacity : null
   write_capacity = var.dynamodb_billing_mode == "PROVISIONED" ? var.dynamodb_table_write_capacity : null

@@ -29,7 +29,6 @@ output "certificate_authority" {
 #   sensitive   = true
 # }
 
-
 output "eks_managed_node_groups" {
   description = "Map of EKS Managed Node Group outputs"
   value       = try(module.eks.eks_managed_node_groups, {})

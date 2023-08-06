@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 resource "tls_private_key" "alb_certificate" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -24,7 +25,6 @@ resource "tls_self_signed_cert" "alb_certificate" {
     "digital_signature",
     "server_auth",
   ]
-
 
   subject {
     common_name         = "amazon.com"
@@ -50,9 +50,8 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
     name      = "grafana-ingress"
     namespace = "grafana"
     annotations = {
-      "kubernetes.io/ingress.class"      = "alb"
-      "alb.ingress.kubernetes.io/scheme" = "internet-facing"
-
+      "kubernetes.io/ingress.class"                    = "alb"
+      "alb.ingress.kubernetes.io/scheme"               = "internet-facing"
       "alb.ingress.kubernetes.io/listen-ports"         = "[{\"HTTP\": 80},{\"HTTPS\":443}]"
       "alb.ingress.kubernetes.io/certificate-arn"      = aws_iam_server_certificate.alb_certificate.arn
       "alb.ingress.kubernetes.io/actions.ssl-redirect" = "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}"
@@ -72,15 +71,9 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
               }
             }
           }
-
           path = "/*"
         }
         path {
-          // backend {
-          //   service_name = "ssl_redirect"
-          //   service_port = "use-annotation"
-          // }
-
           backend {
             service {
               name = "grafana"
@@ -89,25 +82,14 @@ resource "kubernetes_ingress_v1" "grafana_ingress" {
               }
             }
           }
-
           path = "/*"
         }
-
       }
     }
   }
 
-  // provisioner "local-exec" {
-  //   command = "kubectl -n grafana patch ingress grafana-ingress --type='json' -p=[] " //${file(resource/patch-ingress.json)}"
-  //   environment = {
-  //     KUBECONFIG = module.eks.kubeconfig_filename
-  //   }
-  // }
-  depends_on = [
-    #kubernetes_namespace.grafana,
-    module.eks_blueprints_addons //,
-    //module.eks_blueprints_kubernetes_addons_for_alb
-  ]
+  depends_on = [module.eks_blueprints_addons]
+
   provisioner "local-exec" {
     when    = destroy
     command = "sleep 60"
@@ -125,15 +107,9 @@ resource "kubernetes_config_map" "dashboard" {
   }
 
   data = {
-    "htc-metrics.json"        = file("${path.module}/htc-dashboard.json")
-    "kubernetes-metrics.json" = file("${path.module}/kubernetes-dashboard.json")
+    "htc-metrics.json"        = file("${path.module}/files/htc-dashboard.json")
+    "kubernetes-metrics.json" = file("${path.module}/files/kubernetes-dashboard.json")
   }
 
-  depends_on = [
-    #kubernetes_namespace.grafana,
-    aws_iam_server_certificate.alb_certificate,
-    module.eks_blueprints_addons //,
-    //module.eks_blueprints_kubernetes_addons_for_alb
-  ]
-
+  depends_on = [module.eks_blueprints_addons]
 }

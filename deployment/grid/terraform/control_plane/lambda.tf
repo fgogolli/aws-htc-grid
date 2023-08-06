@@ -6,7 +6,7 @@
 
 
 resource "aws_iam_role" "role_lambda_submit_task" {
-  name = "role_lambda_submit_task-${local.suffix}"
+  name               = "role_lambda_submit_task-${local.suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -25,7 +25,7 @@ EOF
 }
 
 resource "aws_iam_role" "role_lambda_get_results" {
-  name = "role_lambda_get_results-${local.suffix}"
+  name               = "role_lambda_get_results-${local.suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -44,7 +44,7 @@ EOF
 }
 
 resource "aws_iam_role" "role_lambda_cancel_tasks" {
-  name = "role_lambda_cancel_tasks-${local.suffix}"
+  name               = "role_lambda_cancel_tasks-${local.suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -64,7 +64,7 @@ EOF
 
 
 resource "aws_iam_role" "role_lambda_ttl_checker" {
-  name = "role_lambda_ttl_checker-${local.suffix}"
+  name               = "role_lambda_ttl_checker-${local.suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -107,49 +107,49 @@ module "submit_task" {
       pip_requirements = "../../../source/control_plane/python/lambda/submit_tasks/requirements.txt"
     }
   ]
-  function_name = var.lambda_name_submit_tasks
+  function_name   = var.lambda_name_submit_tasks
   build_in_docker = true
-  docker_image = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
+  docker_image    = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler = "submit_tasks.lambda_handler"
+  handler     = "submit_tasks.lambda_handler"
   memory_size = 1024
-  timeout = 300
-  runtime = var.lambda_runtime
+  timeout     = 300
+  runtime     = var.lambda_runtime
   create_role = false
   lambda_role = aws_iam_role.role_lambda_submit_task.arn
 
-  vpc_subnet_ids = var.vpc_private_subnet_ids
+  vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
 
-  environment_variables  = {
-    STATE_TABLE_NAME=var.ddb_state_table,
-    STATE_TABLE_SERVICE=var.state_table_service,
-    STATE_TABLE_CONFIG=var.state_table_config,
-    TASKS_QUEUE_NAME=aws_sqs_queue.htc_task_queue["__0"].name,
-    TASKS_QUEUE_DLQ_NAME=aws_sqs_queue.htc_task_queue_dlq.name,
-    METRICS_ARE_ENABLED=var.metrics_are_enabled,
-    METRICS_SUBMIT_TASKS_LAMBDA_CONNECTION_STRING=var.metrics_submit_tasks_lambda_connection_string,
-    ERROR_LOG_GROUP=var.error_log_group,
-    ERROR_LOGGING_STREAM=var.error_logging_stream,
-    TASK_INPUT_PASSED_VIA_EXTERNAL_STORAGE = var.task_input_passed_via_external_storage,
-    GRID_STORAGE_SERVICE = var.grid_storage_service,
-    TASK_QUEUE_SERVICE = var.task_queue_service,
-    TASK_QUEUE_CONFIG = var.task_queue_config,
-    S3_BUCKET = aws_s3_bucket.htc-stdout-bucket.id,
-    REDIS_URL = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
-    METRICS_GRAFANA_PRIVATE_IP = var.nlb_influxdb,
-    REGION = var.region
+  environment_variables = {
+    STATE_TABLE_NAME                              = var.ddb_state_table,
+    STATE_TABLE_SERVICE                           = var.state_table_service,
+    STATE_TABLE_CONFIG                            = var.state_table_config,
+    TASKS_QUEUE_NAME                              = aws_sqs_queue.htc_task_queue["__0"].name,
+    TASKS_QUEUE_DLQ_NAME                          = aws_sqs_queue.htc_task_queue_dlq.name,
+    METRICS_ARE_ENABLED                           = var.metrics_are_enabled,
+    METRICS_SUBMIT_TASKS_LAMBDA_CONNECTION_STRING = var.metrics_submit_tasks_lambda_connection_string,
+    ERROR_LOG_GROUP                               = var.error_log_group,
+    ERROR_LOGGING_STREAM                          = var.error_logging_stream,
+    TASK_INPUT_PASSED_VIA_EXTERNAL_STORAGE        = var.task_input_passed_via_external_storage,
+    GRID_STORAGE_SERVICE                          = var.grid_storage_service,
+    TASK_QUEUE_SERVICE                            = var.task_queue_service,
+    TASK_QUEUE_CONFIG                             = var.task_queue_config,
+    S3_BUCKET                                     = aws_s3_bucket.htc-stdout-bucket.id,
+    REDIS_URL                                     = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
+    METRICS_GRAFANA_PRIVATE_IP                    = var.nlb_influxdb,
+    REGION                                        = var.region
   }
 
-   tags = {
-    service     = "htc-grid"
+  tags = {
+    service = "htc-grid"
   }
   #depends_on = [aws_iam_role_policy_attachment.lambda_logs_attachment, aws_cloudwatch_log_group.submit_task_logs]
 }
 
-module  "get_results" {
+module "get_results" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "4.6.1"
   source_path = [
@@ -174,40 +174,40 @@ module  "get_results" {
       pip_requirements = "../../../source/control_plane/python/lambda/get_results/requirements.txt"
     }
   ]
-  function_name = var.lambda_name_get_results
+  function_name   = var.lambda_name_get_results
   build_in_docker = true
-  docker_image = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
+  docker_image    = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler = "get_results.lambda_handler"
-  memory_size = 1024
-  timeout = 300
-  runtime = var.lambda_runtime
-  create_role = false
-  lambda_role = aws_iam_role.role_lambda_get_results.arn
-  vpc_subnet_ids = var.vpc_private_subnet_ids
+  handler                = "get_results.lambda_handler"
+  memory_size            = 1024
+  timeout                = 300
+  runtime                = var.lambda_runtime
+  create_role            = false
+  lambda_role            = aws_iam_role.role_lambda_get_results.arn
+  vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
   environment_variables = {
-    STATE_TABLE_NAME=var.ddb_state_table,
-    STATE_TABLE_SERVICE=var.state_table_service,
-    STATE_TABLE_CONFIG=var.state_table_config,
-    TASKS_QUEUE_NAME=aws_sqs_queue.htc_task_queue["__0"].name,
-    S3_BUCKET=aws_s3_bucket.htc-stdout-bucket.id,
-    REDIS_URL=aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
-    GRID_STORAGE_SERVICE=var.grid_storage_service,
-    TASK_QUEUE_SERVICE = var.task_queue_service,
-    TASK_QUEUE_CONFIG = var.task_queue_config,
-    TASKS_QUEUE_DLQ_NAME = aws_sqs_queue.htc_task_queue_dlq.name,
-    METRICS_ARE_ENABLED = var.metrics_are_enabled,
+    STATE_TABLE_NAME                             = var.ddb_state_table,
+    STATE_TABLE_SERVICE                          = var.state_table_service,
+    STATE_TABLE_CONFIG                           = var.state_table_config,
+    TASKS_QUEUE_NAME                             = aws_sqs_queue.htc_task_queue["__0"].name,
+    S3_BUCKET                                    = aws_s3_bucket.htc-stdout-bucket.id,
+    REDIS_URL                                    = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
+    GRID_STORAGE_SERVICE                         = var.grid_storage_service,
+    TASK_QUEUE_SERVICE                           = var.task_queue_service,
+    TASK_QUEUE_CONFIG                            = var.task_queue_config,
+    TASKS_QUEUE_DLQ_NAME                         = aws_sqs_queue.htc_task_queue_dlq.name,
+    METRICS_ARE_ENABLED                          = var.metrics_are_enabled,
     METRICS_GET_RESULTS_LAMBDA_CONNECTION_STRING = var.metrics_get_results_lambda_connection_string,
-    ERROR_LOG_GROUP=var.error_log_group,
-    ERROR_LOGGING_STREAM=var.error_logging_stream,
-    METRICS_GRAFANA_PRIVATE_IP = var.nlb_influxdb,
-    REGION = var.region
+    ERROR_LOG_GROUP                              = var.error_log_group,
+    ERROR_LOGGING_STREAM                         = var.error_logging_stream,
+    METRICS_GRAFANA_PRIVATE_IP                   = var.nlb_influxdb,
+    REGION                                       = var.region
   }
-   tags = {
-    service     = "htc-grid"
+  tags = {
+    service = "htc-grid"
   }
   #depends_on = [aws_iam_role_policy_attachment.lambda_logs_attachment, aws_cloudwatch_log_group.submit_task_logs]
 }
@@ -237,44 +237,44 @@ module "cancel_tasks" {
       pip_requirements = "../../../source/control_plane/python/lambda/cancel_tasks/requirements.txt"
     }
   ]
-  function_name = var.lambda_name_cancel_tasks
+  function_name   = var.lambda_name_cancel_tasks
   build_in_docker = true
-  docker_image = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
+  docker_image    = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler = "cancel_tasks.lambda_handler"
+  handler     = "cancel_tasks.lambda_handler"
   memory_size = 1024
-  timeout = 300
-  runtime = var.lambda_runtime
+  timeout     = 300
+  runtime     = var.lambda_runtime
   create_role = false
   lambda_role = aws_iam_role.role_lambda_cancel_tasks.arn
 
-  vpc_subnet_ids = var.vpc_private_subnet_ids
+  vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
 
-  environment_variables  = {
-    STATE_TABLE_NAME=var.ddb_state_table,
-    STATE_TABLE_SERVICE=var.state_table_service,
-    STATE_TABLE_CONFIG=var.state_table_config,
-    TASKS_QUEUE_NAME=aws_sqs_queue.htc_task_queue["__0"].name,
-    TASKS_QUEUE_DLQ_NAME=aws_sqs_queue.htc_task_queue_dlq.name,
-    METRICS_ARE_ENABLED=var.metrics_are_enabled,
-    METRICS_CANCEL_TASKS_LAMBDA_CONNECTION_STRING=var.metrics_cancel_tasks_lambda_connection_string,
-    ERROR_LOG_GROUP=var.error_log_group,
-    ERROR_LOGGING_STREAM=var.error_logging_stream,
-    TASK_INPUT_PASSED_VIA_EXTERNAL_STORAGE = var.task_input_passed_via_external_storage,
-    GRID_STORAGE_SERVICE = var.grid_storage_service,
-    TASK_QUEUE_SERVICE = var.task_queue_service,
-    TASK_QUEUE_CONFIG = var.task_queue_config,
-    S3_BUCKET = aws_s3_bucket.htc-stdout-bucket.id,
-    REDIS_URL = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
-    METRICS_GRAFANA_PRIVATE_IP = var.nlb_influxdb,
-    REGION = var.region
+  environment_variables = {
+    STATE_TABLE_NAME                              = var.ddb_state_table,
+    STATE_TABLE_SERVICE                           = var.state_table_service,
+    STATE_TABLE_CONFIG                            = var.state_table_config,
+    TASKS_QUEUE_NAME                              = aws_sqs_queue.htc_task_queue["__0"].name,
+    TASKS_QUEUE_DLQ_NAME                          = aws_sqs_queue.htc_task_queue_dlq.name,
+    METRICS_ARE_ENABLED                           = var.metrics_are_enabled,
+    METRICS_CANCEL_TASKS_LAMBDA_CONNECTION_STRING = var.metrics_cancel_tasks_lambda_connection_string,
+    ERROR_LOG_GROUP                               = var.error_log_group,
+    ERROR_LOGGING_STREAM                          = var.error_logging_stream,
+    TASK_INPUT_PASSED_VIA_EXTERNAL_STORAGE        = var.task_input_passed_via_external_storage,
+    GRID_STORAGE_SERVICE                          = var.grid_storage_service,
+    TASK_QUEUE_SERVICE                            = var.task_queue_service,
+    TASK_QUEUE_CONFIG                             = var.task_queue_config,
+    S3_BUCKET                                     = aws_s3_bucket.htc-stdout-bucket.id,
+    REDIS_URL                                     = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
+    METRICS_GRAFANA_PRIVATE_IP                    = var.nlb_influxdb,
+    REGION                                        = var.region
   }
 
-   tags = {
-    service     = "htc-grid"
+  tags = {
+    service = "htc-grid"
   }
   #depends_on = [aws_iam_role_policy_attachment.lambda_logs_attachment, aws_cloudwatch_log_group.cancel_tasks_logs]
 }
@@ -306,40 +306,40 @@ module "ttl_checker" {
       pip_requirements = "../../../source/control_plane/python/lambda/ttl_checker/requirements.txt"
     }
   ]
-  function_name = var.lambda_name_ttl_checker
+  function_name   = var.lambda_name_ttl_checker
   build_in_docker = true
-  docker_image = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
+  docker_image    = "${var.aws_htc_ecr}/lambda-build:build-${var.lambda_runtime}"
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler = "ttl_checker.lambda_handler"
+  handler     = "ttl_checker.lambda_handler"
   memory_size = 1024
-  timeout = 55
-  runtime = var.lambda_runtime
+  timeout     = 55
+  runtime     = var.lambda_runtime
   create_role = false
   lambda_role = aws_iam_role.role_lambda_ttl_checker.arn
 
-  vpc_subnet_ids = var.vpc_private_subnet_ids
+  vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
 
   environment_variables = {
-    STATE_TABLE_NAME=var.ddb_state_table,
-    STATE_TABLE_SERVICE=var.state_table_service,
-    STATE_TABLE_CONFIG=var.state_table_config,
-    TASKS_QUEUE_NAME=aws_sqs_queue.htc_task_queue["__0"].name,
-    TASKS_QUEUE_DLQ_NAME=aws_sqs_queue.htc_task_queue_dlq.name
-    METRICS_ARE_ENABLED=var.metrics_are_enabled,
-    TASK_QUEUE_SERVICE = var.task_queue_service,
-    TASK_QUEUE_CONFIG = var.task_queue_config,
-    METRICS_TTL_CHECKER_LAMBDA_CONNECTION_STRING=var.metrics_ttl_checker_lambda_connection_string,
-    ERROR_LOG_GROUP=var.error_log_group,
-    ERROR_LOGGING_STREAM=var.error_logging_stream,
-    METRICS_GRAFANA_PRIVATE_IP = var.nlb_influxdb,
-    REGION = var.region
+    STATE_TABLE_NAME                             = var.ddb_state_table,
+    STATE_TABLE_SERVICE                          = var.state_table_service,
+    STATE_TABLE_CONFIG                           = var.state_table_config,
+    TASKS_QUEUE_NAME                             = aws_sqs_queue.htc_task_queue["__0"].name,
+    TASKS_QUEUE_DLQ_NAME                         = aws_sqs_queue.htc_task_queue_dlq.name
+    METRICS_ARE_ENABLED                          = var.metrics_are_enabled,
+    TASK_QUEUE_SERVICE                           = var.task_queue_service,
+    TASK_QUEUE_CONFIG                            = var.task_queue_config,
+    METRICS_TTL_CHECKER_LAMBDA_CONNECTION_STRING = var.metrics_ttl_checker_lambda_connection_string,
+    ERROR_LOG_GROUP                              = var.error_log_group,
+    ERROR_LOGGING_STREAM                         = var.error_logging_stream,
+    METRICS_GRAFANA_PRIVATE_IP                   = var.nlb_influxdb,
+    REGION                                       = var.region
   }
 
-   tags = {
-    service     = "htc-grid"
+  tags = {
+    service = "htc-grid"
   }
 }
 
@@ -365,20 +365,20 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_ttl_checker_lambda" {
 }
 
 resource "aws_cloudwatch_log_group" "global_error_group" {
-   name = var.error_log_group
-   retention_in_days = 14
+  name              = var.error_log_group
+  retention_in_days = 14
 }
 
 resource "aws_cloudwatch_log_stream" "global_error_stream" {
-   name = var.error_logging_stream
-   log_group_name  = aws_cloudwatch_log_group.global_error_group.name
+  name           = var.error_logging_stream
+  log_group_name = aws_cloudwatch_log_group.global_error_group.name
 }
 
 resource "aws_iam_policy" "lambda_logging_policy" {
   name        = "lambda_logging_policy-${local.suffix}"
   path        = "/"
   description = "IAM policy for logging from a lambda"
-  policy = <<EOF
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -401,7 +401,7 @@ resource "aws_iam_policy" "lambda_cloudwatch_policy" {
   name        = "lambda_cloudwatch_policy-${local.suffix}"
   path        = "/"
   description = "IAM policy to access cloud watch metrics by TTL Lambda"
-  policy = <<EOF
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -421,7 +421,7 @@ resource "aws_iam_policy" "lambda_data_policy" {
   name        = "lambda_data_policy-${local.suffix}"
   path        = "/"
   description = "IAM policy for accessing DDB and SQS from a lambda"
-  policy = <<EOF
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [

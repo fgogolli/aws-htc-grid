@@ -4,13 +4,13 @@
 
 
 resource "aws_api_gateway_rest_api" "htc_grid_private_rest_api" {
-  name        = "openapi-${var.cluster_name}-private"
-  body = jsonencode(yamldecode(templatefile("../../../source/control_plane/openapi/private/api_definition.yaml",{
-    region = var.region
-    account_id = data.aws_caller_identity.current.account_id
-    cancel_lambda_name = module.cancel_tasks.lambda_function_name
+  name = "openapi-${var.cluster_name}-private"
+  body = jsonencode(yamldecode(templatefile("../../../source/control_plane/openapi/private/api_definition.yaml", {
+    region                  = var.region
+    account_id              = data.aws_caller_identity.current.account_id
+    cancel_lambda_name      = module.cancel_tasks.lambda_function_name
     submit_task_lambda_name = module.submit_task.lambda_function_name
-    get_result_lambda_name = module.get_results.lambda_function_name
+    get_result_lambda_name  = module.get_results.lambda_function_name
   })))
   endpoint_configuration {
     types = ["PRIVATE"]
@@ -22,12 +22,12 @@ resource "aws_api_gateway_rest_api" "htc_grid_private_rest_api" {
 resource "aws_api_gateway_deployment" "htc_grid_private_deployment" {
   rest_api_id = aws_api_gateway_rest_api.htc_grid_private_rest_api.id
   triggers = {
-    redeployment = templatefile("../../../source/control_plane/openapi/private/api_definition.yaml",{
-      region = var.region
-      account_id = data.aws_caller_identity.current.account_id
-      cancel_lambda_name = module.cancel_tasks.lambda_function_name
+    redeployment = templatefile("../../../source/control_plane/openapi/private/api_definition.yaml", {
+      region                  = var.region
+      account_id              = data.aws_caller_identity.current.account_id
+      cancel_lambda_name      = module.cancel_tasks.lambda_function_name
       submit_task_lambda_name = module.submit_task.lambda_function_name
-      get_result_lambda_name = module.get_results.lambda_function_name
+      get_result_lambda_name  = module.get_results.lambda_function_name
     })
   }
 
@@ -99,30 +99,30 @@ resource "aws_lambda_permission" "openapi_htc_grid_apigw_private_lambda_permissi
 
 data "aws_iam_policy_document" "private_api_policy_document" {
   statement {
-    effect =  "Allow"
+    effect  = "Allow"
     actions = ["execute-api:Invoke"]
     resources = [
       "execute-api:/*"
     ]
     principals {
       identifiers = ["*"]
-      type = "AWS"
+      type        = "AWS"
     }
   }
   statement {
-    effect = "Deny"
-    actions = [ "execute-api:Invoke"]
-    resources =  [
+    effect  = "Deny"
+    actions = ["execute-api:Invoke"]
+    resources = [
       "execute-api:/*"
     ]
     condition {
-      test = "StringNotEquals"
-      values = [ var.vpc_id ]
+      test     = "StringNotEquals"
+      values   = [var.vpc_id]
       variable = "aws:SourceVpc"
     }
     principals {
       identifiers = ["*"]
-      type = "AWS"
+      type        = "AWS"
     }
   }
 }

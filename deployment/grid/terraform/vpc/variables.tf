@@ -9,29 +9,29 @@ variable "region" {
 
 
 variable "cluster_name" {
-  default = "htc"
+  default     = "htc"
   description = "Name of EKS cluster in AWS"
 }
 
 
 variable "public_subnets" {
   description = "IP range for public subnet"
-  type = number
+  type        = number
 }
 
 variable "private_subnets" {
   description = "IP range for private subnet"
-  type = number
+  type        = number
 }
 
 variable "vpc_range" {
   description = "IP range for private subnet"
-  type = number
+  type        = number
 }
 
 
 variable "enable_private_subnet" {
   description = "enable private subnet"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }

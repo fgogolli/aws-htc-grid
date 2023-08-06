@@ -22,6 +22,6 @@ output "private_api_gateway_url" {
 
 
 output "api_gateway_key" {
-  value = aws_api_gateway_api_key.htc_grid_api_key.value
+  value     = aws_api_gateway_api_key.htc_grid_api_key.value
   sensitive = true
 }

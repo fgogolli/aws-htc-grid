@@ -160,7 +160,7 @@ variable "vpc_cidr" {
 }
 variable "nlb_influxdb" {
   description = "network load balancer url  in front of influxdb"
-  default = ""
+  default     = ""
 }
 
 variable "cognito_userpool_arn" {

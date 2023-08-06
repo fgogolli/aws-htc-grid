@@ -3,7 +3,6 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
 
-
 #Agent permissions
 data "aws_iam_policy_document" "agent_permissions" {
   statement {
@@ -28,7 +27,14 @@ data "aws_iam_policy_document" "agent_permissions" {
   }
 }
 
-#Agent permissions
+
+resource "aws_iam_policy" "agent_permissions" {
+  description = "The permission required by the HTC agent"
+  policy      = data.aws_iam_policy_document.agent_permissions.json
+}
+
+
+#EKS Pull Through Cache Permissions
 data "aws_iam_policy_document" "eks_pull_through_cache_permission" {
   statement {
     sid    = "PullThroughCacheFromReadOnlyRole"
@@ -46,11 +52,6 @@ data "aws_iam_policy_document" "eks_pull_through_cache_permission" {
   }
 }
 
-
-resource "aws_iam_policy" "agent_permissions" {
-  description = "The permission required by the HTC agent"
-  policy      = data.aws_iam_policy_document.agent_permissions.json
-}
 
 resource "aws_iam_policy" "eks_pull_through_cache_permission" {
   description = "The permissions for the kubelet to use ECR pull through cache"

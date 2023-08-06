@@ -25,5 +25,5 @@ output "public_subnet_ids" {
 
 output "default_security_group_id" {
   description = "id of the default security group created with the VPC"
-  value = module.vpc.default_security_group_id
+  value       = module.vpc.default_security_group_id
 }

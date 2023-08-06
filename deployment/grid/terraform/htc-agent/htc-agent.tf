@@ -4,7 +4,7 @@
 
 locals {
   # check if var.suffix is empty then create a random suffix else use var.suffix
-  suffix = var.suffix != "" ? var.suffix : random_string.random.result
+  suffix  = var.suffix != "" ? var.suffix : random_string.random.result
   handler = var.lambda_handler_file_name == "" ? "${var.lambda_handler_file_name}.${var.lambda_handler_function_name}" : var.lambda_handler_file_name
 }
 
@@ -18,10 +18,10 @@ resource "random_string" "random" {
 
 
 module "eks_blueprints_addon" {
-  source = "aws-ia/eks-blueprints-addon/aws"
+  source  = "aws-ia/eks-blueprints-addon/aws"
   version = "~>1.0"
 
-  name            = "htc-agent"
+  name             = "htc-agent"
   chart            = "agent-htc-lambda"
   repository       = var.agent_chart_url
   namespace        = var.agent_namespace
@@ -30,11 +30,11 @@ module "eks_blueprints_addon" {
 
   set = [
     {
-      name = "fullnameOverride"
+      name  = "fullnameOverride"
       value = var.agent_name
     },
     {
-      name = "terminationGracePeriodSeconds"
+      name  = "terminationGracePeriodSeconds"
       value = var.termination_grace_period
     },
     #lambda configuration
@@ -64,23 +64,23 @@ module "eks_blueprints_addon" {
       value = var.agent_image_tag
     },
     {
-      name = "imageAgent.pullPolicy"
+      name  = "imageAgent.pullPolicy"
       value = var.agent_pull_policy
     },
     {
-      name = "resourcesAgent.limits.cpu"
+      name  = "resourcesAgent.limits.cpu"
       value = "${var.agent_max_cpu}m"
     },
     {
-      name = "resourcesAgent.requests.cpu"
+      name  = "resourcesAgent.requests.cpu"
       value = "${var.agent_min_cpu}m"
     },
     {
-      name = "resourcesAgent.limits.memory"
+      name  = "resourcesAgent.limits.memory"
       value = "${var.agent_max_memory}Mi"
     },
     {
-      name = "resourcesAgent.requests.memory"
+      name  = "resourcesAgent.requests.memory"
       value = "${var.agent_min_memory}Mi"
     },
     #Test section
@@ -93,7 +93,7 @@ module "eks_blueprints_addon" {
       value = var.test_agent_image_tag
     },
     {
-      name = "imageTestAgent.pullPolicy"
+      name  = "imageTestAgent.pullPolicy"
       value = var.test_pull_policy
     },
     #Lambda section
@@ -106,23 +106,23 @@ module "eks_blueprints_addon" {
       value = var.lambda_image_tag
     },
     {
-      name = "imageLambdaServer.pullPolicy"
+      name  = "imageLambdaServer.pullPolicy"
       value = var.lambda_pull_policy
     },
     {
-      name = "resourcesLambdaServer.limits.cpu"
+      name  = "resourcesLambdaServer.limits.cpu"
       value = "${var.lambda_max_cpu}m"
     },
     {
-      name = "resourcesLambdaServer.requests.cpu"
+      name  = "resourcesLambdaServer.requests.cpu"
       value = "${var.lambda_min_cpu}m"
     },
     {
-      name = "resourcesLambdaServer.limits.memory"
+      name  = "resourcesLambdaServer.limits.memory"
       value = "${var.lambda_max_memory}Mi"
     },
     {
-      name = "resourcesLambdaServer.requests.memory"
+      name  = "resourcesLambdaServer.requests.memory"
       value = "${var.lambda_min_memory}Mi"
     },
     #get-layer section
@@ -183,7 +183,7 @@ module "eks_blueprints_addon" {
 
   oidc_providers = {
     this = {
-      provider_arn = var.eks_oidc_provider_arn
+      provider_arn    = var.eks_oidc_provider_arn
       service_account = "htc-agent-sa"
     }
   }

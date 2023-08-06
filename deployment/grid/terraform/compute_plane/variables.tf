@@ -6,11 +6,6 @@ variable "region" {
   description = "AWS region"
 }
 
-# variable "cluster_name" {
-#   default = "htc_aws"
-#   description = "Name of EKS cluster in AWS"
-# }
-
 variable "input_role" {
   description = "Additional IAM roles to add to the aws-auth configmap."
   type = list(object({
@@ -25,8 +20,8 @@ variable "kubernetes_version" {
 }
 
 variable "htc_agent_namespace" {
-  default     = "default"
   description = "kubernetes namespace for the deployment of the agent"
+  default     = "default"
 }
 
 variable "aws_htc_ecr" {
@@ -124,8 +119,8 @@ variable "metrics_event_rule_time" {
 }
 
 variable "suffix" {
-  default     = ""
   description = "suffix for generating unique name for AWS resource"
+  default     = ""
 }
 
 variable "eks_worker_groups" {
@@ -182,10 +177,6 @@ variable "grafana_configuration" {
     initChownData_tag           = string
     sidecar_tag                 = string
     admin_password              = string
-
-    # busybox
-
-
   })
 }
 

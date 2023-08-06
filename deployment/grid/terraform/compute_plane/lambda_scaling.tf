@@ -3,26 +3,6 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
 
-
-resource "aws_iam_role" "role_lambda_metrics" {
-  name               = "role_lambda_metrics-${local.suffix}"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
 module "scaling_metrics" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "4.6.1"
@@ -81,10 +61,12 @@ module "scaling_metrics" {
     ERROR_LOGGING_STREAM = var.error_logging_stream,
     TASKS_QUEUE_NAME     = var.tasks_queue_name,
   }
+
   tags = {
     service = "htc-grid"
   }
 }
+
 
 resource "aws_cloudwatch_event_rule" "scaling_metrics_event_rule" {
   name                = "scaling_metrics_event_rule-${local.suffix}"
@@ -92,11 +74,13 @@ resource "aws_cloudwatch_event_rule" "scaling_metrics_event_rule" {
   schedule_expression = var.metrics_event_rule_time
 }
 
+
 resource "aws_cloudwatch_event_target" "check_scaling_metrics_lambda" {
   rule      = aws_cloudwatch_event_rule.scaling_metrics_event_rule.name
   target_id = "lambda"
   arn       = module.scaling_metrics.lambda_function_arn
 }
+
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_scaling_metrics_lambda" {
   statement_id  = "AllowExecutionFromCloudWatch"
@@ -111,6 +95,27 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_check_scaling_metrics
 #   name = "/aws/lambda/${aws_lambda_function.scaling_metrics.function_name}"
 #   retention_in_days = 14
 # }
+
+
+# Lambda Scaling Metrics IAM Role & Permissions
+resource "aws_iam_role" "role_lambda_metrics" {
+  name               = "role_lambda_metrics-${local.suffix}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
 
 
 resource "aws_iam_policy" "lambda_metrics_logging_policy" {
@@ -134,6 +139,7 @@ resource "aws_iam_policy" "lambda_metrics_logging_policy" {
 }
 EOF
 }
+
 
 resource "aws_iam_policy" "lambda_metrics_data_policy" {
   name        = "lambda_metrics_data_policy-${local.suffix}"
@@ -166,8 +172,8 @@ resource "aws_iam_role_policy_attachment" "lambda_metrics_logs_attachment" {
   policy_arn = aws_iam_policy.lambda_metrics_logging_policy.arn
 }
 
+
 resource "aws_iam_role_policy_attachment" "lambda_metrics_data_attachment" {
   role       = aws_iam_role.role_lambda_metrics.name
   policy_arn = aws_iam_policy.lambda_metrics_data_policy.arn
 }
-

@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 locals {
   cognito_domain_name = replace("${lower(var.suffix)}-${random_string.random.result}", "aws", "")
 }
+
 
 resource "aws_cognito_user_pool" "htc_pool" {
   name = "htc_pool"
@@ -16,6 +18,7 @@ resource "aws_cognito_user_pool" "htc_pool" {
   }
 }
 
+
 resource "aws_cognito_user_pool_client" "client" {
   name = "client"
 
@@ -24,7 +27,6 @@ resource "aws_cognito_user_pool_client" "client" {
   generate_secret                      = true
   allowed_oauth_flows                  = ["code"]
   callback_urls                        = ["https://${kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname}/oauth2/idpresponse"]
-  //callback_urls = ["https://example.com"]
   allowed_oauth_scopes = [
     "email", "openid"
   ]
@@ -39,6 +41,7 @@ resource "aws_cognito_user_pool_client" "client" {
 
 }
 
+
 resource "aws_cognito_user_pool_client" "user_data_client" {
   name = "user_data_client"
 
@@ -51,6 +54,7 @@ resource "aws_cognito_user_pool_client" "user_data_client" {
   ]
 
 }
+
 
 resource "null_resource" "modify_ingress" {
   provisioner "local-exec" {
