@@ -12,12 +12,12 @@ resource "tls_private_key" "alb_certificate" {
 resource "tls_self_signed_cert" "alb_certificate" {
   private_key_pem = tls_private_key.alb_certificate.private_key_pem
 
-  # Certificate expires after 1 month.
-  validity_period_hours = 730
+  # Certificate expires after 10 days.
+  validity_period_hours = 240
 
-  # Generate a new certificate if Terraform is run within 24
+  # Generate a new certificate if Terraform is run within 48
   # hours of the certificate's expiration time.
-  early_renewal_hours = 24
+  early_renewal_hours = 48
 
   # Reasonable set of uses for a server SSL certificate.
   allowed_uses = [
@@ -36,7 +36,6 @@ resource "tls_self_signed_cert" "alb_certificate" {
 }
 
 
-# For example, this can be used to populate an AWS IAM server certificate.
 resource "aws_iam_server_certificate" "alb_certificate" {
   name             = "alb_self_signed_cert-${local.suffix}-${tls_self_signed_cert.alb_certificate.id}"
   certificate_body = tls_self_signed_cert.alb_certificate.cert_pem

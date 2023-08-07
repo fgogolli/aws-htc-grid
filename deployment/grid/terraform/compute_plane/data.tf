@@ -8,9 +8,8 @@ data "kubernetes_service" "influxdb_load_balancer" {
     name      = "influxdb"
     namespace = "influxdb"
   }
-  depends_on = [
-    module.eks_blueprints_addons
-  ]
+
+  depends_on = [module.eks_blueprints_addons]
 }
 
 

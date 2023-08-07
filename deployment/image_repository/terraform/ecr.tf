@@ -10,6 +10,7 @@ data "aws_caller_identity" "current" {}
 # create all ECR repository
 resource "aws_ecr_repository" "third_party" {
   count = length(var.repository)
+
   name  = var.repository[count.index]
 }
 
@@ -19,8 +20,9 @@ resource "null_resource" "authenticate_to_ecr_repository" {
   triggers = {
     always_run = timestamp()
   }
+
   provisioner "local-exec" {
-    command = " aws ecr get-login-password --region ${var.region}  | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com"
+    command = " aws ecr get-login-password --region ${var.region} | docker login --username AWS --password-stdin ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com"
   }
 }
 
@@ -41,9 +43,11 @@ resource "null_resource" "pull_python_env" {
   triggers = {
     always_run = timestamp()
   }
+
   provisioner "local-exec" {
     command = "docker pull  --platform linux/amd64 ${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/lambda-build:build-${var.lambda_runtime}"
   }
+
   depends_on = [
     null_resource.authenticate_to_ecr_repository,
     null_resource.copy_image
@@ -54,10 +58,12 @@ resource "null_resource" "pull_python_env" {
 # push tag and pull images from every image to copy
 resource "null_resource" "copy_image" {
   for_each = var.image_to_copy
+
   triggers = {
     state      = "${each.key}-${each.value}",
     always_run = timestamp()
   }
+
   provisioner "local-exec" {
     command = <<-EOT
     if ! docker pull  --platform linux/amd64 ${each.key}
@@ -77,6 +83,7 @@ resource "null_resource" "copy_image" {
     fi
   EOT
   }
+
   depends_on = [
     aws_ecr_repository.third_party,
     null_resource.authenticate_to_ecr_repository

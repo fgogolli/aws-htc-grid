@@ -1,4 +1,4 @@
-# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
@@ -23,7 +23,7 @@ locals {
     [
       {
         node_group_name = "core-ondemand",
-        # instance_types  = ["m6a.2xlarge", "m6i.2xlarge", "m6idn.2xlarge", "m6in.2xlarge", "m5.2xlarge"],
+        # instance_types  = ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge", "m5d.xlarge", "m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"],
         capacity_type = "ON_DEMAND",
         iam_role_additional_policies = {
           agent_permissions = aws_iam_policy.agent_permissions.arn

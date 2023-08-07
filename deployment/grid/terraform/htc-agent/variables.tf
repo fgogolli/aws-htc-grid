@@ -35,7 +35,6 @@ variable "suffix" {
   default     = ""
 }
 
-
 variable "eks_oidc_provider_arn" {
   description = "EKS Cluster OIDC Provider ARN for IRSA Permissions"
   type        = string
@@ -154,7 +153,7 @@ variable "termination_grace_period" {
 }
 
 variable "lambda_configuration_storage_type" {
-  description = "Storage type for Lambda Layer either \"Layer\" or \"S3\""
+  description = "Storage type for Lambda Layer either [Layer] or [S3]"
   type        = string
   default     = "S3"
 }
@@ -188,8 +187,6 @@ variable "lambda_configuration_function_name" {
   default     = "mock_computation"
 }
 
-
-
 variable "lambda_handler_file_name" {
   description = "The file name  of the lambda handler"
   type        = string
@@ -211,7 +208,6 @@ variable "dimension_name_metrics" {
 variable "dimension_value_metrics" {
   description = "Dimensions name for the CloudWatch metrics"
 }
-
 
 variable "average_period" {
   description = "Average period in second used by the HPA to compute the current load on the system"

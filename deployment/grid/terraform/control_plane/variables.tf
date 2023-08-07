@@ -110,7 +110,6 @@ variable "dynamodb_table_read_capacity" {
   description = "read capacity for the status table"
 }
 
-
 variable "dynamodb_gsi_index_table_write_capacity" {
   description = "write capacity for the status table (gsi index)"
 }
