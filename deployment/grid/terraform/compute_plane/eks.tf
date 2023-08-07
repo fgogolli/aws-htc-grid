@@ -186,8 +186,8 @@ module "eks_blueprints_addons" {
     create_namespace = true
     chart_version    = "0.1.23"
     values = [templatefile("${path.module}/../../charts/values/aws-for-fluentbit.yaml", {
+      aws_htc_ecr  = var.aws_htc_ecr
       region     = var.region
-      account_id = data.aws_caller_identity.current.account_id
     })]
   }
 
@@ -208,7 +208,6 @@ module "eks_blueprints_addons" {
   enable_aws_load_balancer_controller = true
   aws_load_balancer_controller = {
     values = [templatefile("${path.module}/../../charts/values/aws-alb-controller.yaml", {
-      cluster_name = module.eks.cluster_name
       region       = var.region
       vpc_id       = var.vpc_id
     })]
@@ -223,7 +222,6 @@ module "eks_blueprints_addons" {
     values = [
       templatefile("${path.module}/../../charts/values/aws-cloudwatch-metrics.yaml", {
         aws_htc_ecr  = var.aws_htc_ecr
-        cluster_name = module.eks.cluster_name
       })
     ]
   }
@@ -261,8 +259,8 @@ module "eks_blueprints_addons" {
       chart_version    = "15.17.0"
       repository       = "https://prometheus-community.github.io/helm-charts"
       values = [templatefile("${path.module}/../../charts/values/prometheus.yaml", {
+        aws_htc_ecr  = var.aws_htc_ecr
         region                 = var.region
-        account_id             = data.aws_caller_identity.current.account_id
         kube_state_metrics_tag = var.prometheus_configuration.kube_state_metrics_tag
         configmap_reload_tag   = var.prometheus_configuration.configmap_reload_tag
       })]
