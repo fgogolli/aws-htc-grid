@@ -41,7 +41,6 @@ resource "aws_iam_policy" "lambda_logging_policy" {
   "Statement": [
     {
       "Action": [
-        "logs:CreateLogGroup",
         "logs:CreateLogStream",
         "logs:PutLogEvents",
         "logs:DescribeLogStreams"

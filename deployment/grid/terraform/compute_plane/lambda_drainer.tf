@@ -108,40 +108,65 @@ EOF
 }
 
 
-data "aws_iam_policy_document" "lambda_drainer_policy_document" {
-  statement {
-    sid    = ""
-    effect = "Allow"
-    actions = [
-      "ec2:CreateNetworkInterface",
-      "ec2:DeleteNetworkInterface",
-      "ec2:DescribeNetworkInterfaces",
-      "autoscaling:CompleteLifecycleAction",
-      "ec2:DescribeInstances",
-      "eks:DescribeCluster",
-      "sts:GetCallerIdentity"
-    ]
-    resources = ["*"]
-  }
+resource "aws_iam_policy" "lambda_drainer_logging_policy" {
+  name        = "lambda_drainer_logging_policy-${local.suffix}"
+  path        = "/"
+  description = "IAM policy for logging from the lambda_drainer lambda"
+  policy      = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
 }
 
 
-resource "aws_iam_policy" "lambda_drainer_policy" {
-  name_prefix = "lambda-drainer-policy"
-  description = "Policy for draining  nodes of an EKS cluster"
-  policy      = data.aws_iam_policy_document.lambda_drainer_policy_document.json
+resource "aws_iam_policy" "lambda_drainer_data_policy" {
+  name        = "lambda-drainer-policy-${local.suffix}"
+  path        = "/"
+  description = "Policy for draining nodes of an EKS cluster"
+  policy      = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:CreateNetworkInterface",
+        "ec2:DeleteNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "autoscaling:CompleteLifecycleAction",
+        "ec2:DescribeInstances",
+        "eks:DescribeCluster",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*",
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
 
-resource "aws_iam_role_policy_attachment" "lambda_drainer_basic_policy_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+resource "aws_iam_role_policy_attachment" "lambda_drainer_logs_attachment" {
   role       = aws_iam_role.role_lambda_drainer.name
+  policy_arn = aws_iam_policy.lambda_drainer_logging_policy.arn
 }
 
 
-resource "aws_iam_role_policy_attachment" "lambda_drainer_policy_attachment" {
-  policy_arn = aws_iam_policy.lambda_drainer_policy.arn
+resource "aws_iam_role_policy_attachment" "lambda_drainer_data_attachment" {
   role       = aws_iam_role.role_lambda_drainer.name
+  policy_arn = aws_iam_policy.lambda_drainer_data_policy.arn
 }
 
 

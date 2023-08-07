@@ -4,7 +4,7 @@
 
 apiVersion: v2
 name: htc
-description: A Helm chart for Kubernetes
+description: A Helm chart for Kubernetes used to deploy HTC-Grid
 
 # A chart can be either an 'application' or a 'library' chart.
 #

@@ -70,6 +70,7 @@ module "submit_task" {
   }
 }
 
+
 #Lambda Submit Task IAM Role & Permissions
 resource "aws_iam_role" "role_lambda_submit_task" {
   name               = "role_lambda_submit_task-${local.suffix}"

@@ -71,6 +71,7 @@ module "cancel_tasks" {
 }
 
 
+#Lambda Cancel Tasks IAM Role & Permissions
 resource "aws_iam_role" "role_lambda_cancel_tasks" {
   name               = "role_lambda_cancel_tasks-${local.suffix}"
   assume_role_policy = <<EOF
@@ -91,7 +92,7 @@ EOF
 }
 
 
-#Lambda Cancel Tasks IAM Role & Permissions
+
 resource "aws_iam_role_policy_attachment" "cancel_tasks_lambda_logs_attachment" {
   role       = aws_iam_role.role_lambda_cancel_tasks.name
   policy_arn = aws_iam_policy.lambda_logging_policy.arn
