@@ -29,7 +29,7 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_flows_user_pool_client = true
   generate_secret                      = true
   allowed_oauth_flows                  = ["code"]
-  callback_urls                        = ["https://${kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname}/oauth2/idpresponse"]
+  callback_urls                        = [try("https://${data.kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname}/oauth2/idpresponse", "")]
   allowed_oauth_scopes = [
     "email", "openid"
   ]
@@ -61,7 +61,7 @@ resource "aws_cognito_user_pool_client" "user_data_client" {
 }
 
 
-resource "null_resource" "create_cognito_user" {
+resource "null_resource" "cognito_user" {
   triggers = {
     user_pool_id           = aws_cognito_user_pool.htc_pool.id
     client_id              = aws_cognito_user_pool_client.user_data_client.id
@@ -92,21 +92,29 @@ resource "null_resource" "create_cognito_user" {
   }
 }
 
+data "kubernetes_ingress_v1" "grafana_ingress" {
+  metadata {
+    name      = "grafana"
+    namespace = "grafana"
+  }
+}
 
 resource "null_resource" "grafana_ingress_auth" {
   triggers = {
     user_pool_arn          = aws_cognito_user_pool.htc_pool.arn
     client_id              = aws_cognito_user_pool_client.client.id
     cognito_domain         = local.cognito_domain_name
+    grafana_domain_name    = data.kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname
     grafana_admin_password = sensitive(var.grafana_configuration.admin_password)
   }
 
   provisioner "local-exec" {
-    command = "kubectl -n grafana annotate ingress grafana-ingress --overwrite alb.ingress.kubernetes.io/auth-idp-cognito=\"{\\\"UserPoolArn\\\": \\\"${self.triggers.user_pool_arn}\\\",\\\"UserPoolClientId\\\":\\\"${self.triggers.client_id}\\\",\\\"UserPoolDomain\\\":\\\"${self.triggers.cognito_domain}\\\"}\" alb.ingress.kubernetes.io/auth-on-unauthenticated-reques=authenticate alb.ingress.kubernetes.io/auth-scope=openid alb.ingress.kubernetes.io/auth-session-cookie=AWSELBAuthSessionCookie alb.ingress.kubernetes.io/auth-session-timeout=\"3600\" alb.ingress.kubernetes.io/auth-type=cognito"
+    command = "kubectl -n grafana annotate ingress grafana --overwrite alb.ingress.kubernetes.io/auth-idp-cognito=\"{\\\"UserPoolArn\\\": \\\"${self.triggers.user_pool_arn}\\\",\\\"UserPoolClientId\\\":\\\"${self.triggers.client_id}\\\",\\\"UserPoolDomain\\\":\\\"${self.triggers.cognito_domain}\\\"}\" alb.ingress.kubernetes.io/auth-on-unauthenticated-reques=authenticate alb.ingress.kubernetes.io/auth-scope=openid alb.ingress.kubernetes.io/auth-session-cookie=AWSELBAuthSessionCookie alb.ingress.kubernetes.io/auth-session-timeout=\"3600\" alb.ingress.kubernetes.io/auth-type=cognito"
   }
 
   depends_on = [
-    kubernetes_ingress_v1.grafana_ingress,
-    null_resource.create_cognito_user
+    module.eks_blueprints_addons,
+    data.kubernetes_ingress_v1.grafana_ingress,
+    null_resource.cognito_user
   ]
 }

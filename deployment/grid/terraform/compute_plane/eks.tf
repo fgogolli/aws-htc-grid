@@ -27,7 +27,7 @@ module "eks" {
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type                              = "AL2_x86_64"
-    instance_types                        = ["m6a.xlarge", "m6i.xlarge", "m6idn.xlarge", "m6in.xlarge", "m5.xlarge"]
+    instance_types                        = ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge","m5d.xlarge","m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"]
     attach_cluster_primary_security_group = false
   }
 
@@ -280,6 +280,10 @@ module "eks_blueprints_addons" {
         grafana_configuration_downloadDashboardsImage_tag = var.grafana_configuration.downloadDashboardsImage_tag
         grafana_configuration_sidecar_tag                 = var.grafana_configuration.sidecar_tag
         grafana_configuration_admin_password              = var.grafana_configuration.admin_password
+        alb_certificate_arn                               = aws_iam_server_certificate.alb_certificate.arn
+        vpc_public_subnets                                = join(",", var.vpc_public_subnet_ids)
+        htc_metrics_dashboard_json                        = indent(8, file("${path.module}/files/htc-dashboard.json"))
+        kubernetes_metrics_dashboard_json                 = indent(8, file("${path.module}/files/kubernetes-dashboard.json"))
       })]
     }
   }

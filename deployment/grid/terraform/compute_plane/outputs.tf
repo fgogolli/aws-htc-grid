@@ -70,5 +70,5 @@ output "agent_permissions_policy_arn" {
 
 output "grafana_ingress_domain" {
   description = "Ingress Domain for Grafana"
-  value       = "https://${kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname}"
+  value       = "https://${data.kubernetes_ingress_v1.grafana_ingress.status.0.load_balancer.0.ingress.0.hostname}"
 }

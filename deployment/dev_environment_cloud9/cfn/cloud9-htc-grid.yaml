@@ -50,7 +50,7 @@ Parameters:
   HTCGridVersion:
     Description: HTC Grid Version to install on Cloud9
     Type: String
-    Default: 0.3.5
+    Default: 0.4.0
     ConstraintDescription: Must be a valid HTC Grid version
   #Used only by Event Engine, if you are self-deploying the stack leave the default value to NONE
   EETeamRoleArn:

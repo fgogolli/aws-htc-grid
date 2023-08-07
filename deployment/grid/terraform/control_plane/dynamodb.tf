@@ -5,7 +5,7 @@
 
 module "dynamodb_table" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "3.1.2"
+  version = "~> 3.0"
 
   name    = var.ddb_state_table
 

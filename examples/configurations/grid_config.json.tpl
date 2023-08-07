@@ -9,7 +9,7 @@
   "eks_worker_groups" : [
       {
         "node_group_name" : "worker-small-spot",
-        "instance_types"  : ["m5.xlarge","m5d.xlarge","m5a.xlarge"],
+        "instance_types"  : ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge","m5d.xlarge","m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"],
         "capacity_type"   : "SPOT",
         "min_size"        : 1,
         "max_size"        : 3,
@@ -18,7 +18,7 @@
       },
       {
         "node_group_name" : "worker-medium-spot",
-        "instance_types"  : ["m5.2xlarge","m5d.2xlarge", "m5a.2xlarge"],
+        "instance_types"  : ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge","m5d.xlarge","m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"],
         "capacity_type"   : "SPOT",
         "min_size"        : 0,
         "max_size"        : 3,
@@ -26,7 +26,7 @@
       },
       {
          "node_group_name" : "worker-large-spot",
-         "instance_types"  : ["m5.4xlarge","m5d.4xlarge", "m5a.4xlarge"],
+         "instance_types"  : ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge","m5d.xlarge","m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"],
          "capacity_type"   : "SPOT",
          "min_size"        : 0,
          "max_size"        : 3,
