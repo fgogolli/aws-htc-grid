@@ -71,7 +71,7 @@ resource "null_resource" "cognito_user" {
 
   # The grafana_configuration.admin_password variable value is used at first creation only, and then the trigger value is used for further changes/updates
   provisioner "local-exec" {
-    command = <<-EOT
+    command    = <<-EOT
       aws cognito-idp sign-up --region ${self.triggers.region} --client-id ${self.triggers.client_id} --username admin --password ${sensitive(var.grafana_configuration.admin_password)} && \
       aws cognito-idp admin-confirm-sign-up --region ${self.triggers.region} --user-pool-id ${self.triggers.user_pool_id} --username admin
     EOT
@@ -79,13 +79,13 @@ resource "null_resource" "cognito_user" {
   }
 
   provisioner "local-exec" {
-    command =  <<-EOT
+    command = <<-EOT
       aws cognito-idp admin-get-user --region ${self.triggers.region} --user-pool-id ${self.triggers.user_pool_id} --username admin >/dev/null 2>&1 && \
       aws cognito-idp admin-set-user-password --region ${self.triggers.region} --user-pool-id ${self.triggers.user_pool_id} --username admin --password '${self.triggers.grafana_admin_password}' || \
       echo "Failed creating admin user in Cognito for Grafana! Please do so manually!"
     EOT
   }
-  
+
   provisioner "local-exec" {
     when    = destroy
     command = "aws cognito-idp admin-delete-user --region ${self.triggers.region} --user-pool-id ${self.triggers.user_pool_id} --username admin"

@@ -14,9 +14,9 @@ While the deployment of Grafana uses self-signed certifictes for encryption, our
 ## Create a cognito user (CLI)
 
 All the services accessible via a public URL require authentication via Amazon Cognito. In the case of Grafana, a default user called `admin` is created as part of the deployment.
-The initial password for the user will be the value for `GRAFANA_ADMIN_PASSWORD`, as used in the section [Deploy HTC-Grid]({{< ref "20_deploy_htc/70_deploying_htc/_index.en.md" >}}), however, you will be required to change this upon your first login.
+The initial password for the user will be the value for `GRAFANA_ADMIN_PASSWORD`, as used in the section [Deploy HTC-Grid]({{< ref "20_deploy_htc/70_deploying_htc/_index.en.md" >}}). However, you will be required to change this upon your first login.
 
-However, additional users can be created as below:
+In addition to the already setup `admin` user, more users can be created as below:
 
 {{% notice warning %}}
 Replace `<my_cognito_user>` and `<my_cognito_password>` with your own username and password.
@@ -37,8 +37,6 @@ userpoolid=$(make get-userpool-id  TAG=$TAG REGION=$HTCGRID_REGION)
 aws cognito-idp sign-up --region $HTCGRID_REGION --client-id $clientid --username $USERNAME --password $PASSWORD
 aws cognito-idp admin-confirm-sign-up --region $HTCGRID_REGION --user-pool-id $userpoolid --username $USERNAME
 ```
-
-To create additional users, the above commands can be repeated as many times as required, adjusting the `USERNAME` and `PASSWORD` values in each iteration.
 
 ## Grafana
 

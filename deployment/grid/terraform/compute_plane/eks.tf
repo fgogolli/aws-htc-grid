@@ -27,7 +27,7 @@ module "eks" {
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type                              = "AL2_x86_64"
-    instance_types                        = ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge","m5d.xlarge","m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"]
+    instance_types                        = ["m6i.xlarge", "m6id.xlarge", "m6a.xlarge", "m6in.xlarge", "m5.xlarge", "m5d.xlarge", "m5a.xlarge", "m5ad.xlarge", "m5n.xlarge"]
     attach_cluster_primary_security_group = false
   }
 
@@ -186,8 +186,8 @@ module "eks_blueprints_addons" {
     create_namespace = true
     chart_version    = "0.1.23"
     values = [templatefile("${path.module}/../../charts/values/aws-for-fluentbit.yaml", {
-      aws_htc_ecr  = var.aws_htc_ecr
-      region     = var.region
+      aws_htc_ecr = var.aws_htc_ecr
+      region      = var.region
     })]
   }
 
@@ -208,8 +208,8 @@ module "eks_blueprints_addons" {
   enable_aws_load_balancer_controller = true
   aws_load_balancer_controller = {
     values = [templatefile("${path.module}/../../charts/values/aws-alb-controller.yaml", {
-      region       = var.region
-      vpc_id       = var.vpc_id
+      region = var.region
+      vpc_id = var.vpc_id
     })]
   }
 
@@ -221,7 +221,7 @@ module "eks_blueprints_addons" {
     namespace     = "amazon-cloudwatch"
     values = [
       templatefile("${path.module}/../../charts/values/aws-cloudwatch-metrics.yaml", {
-        aws_htc_ecr  = var.aws_htc_ecr
+        aws_htc_ecr = var.aws_htc_ecr
       })
     ]
   }
@@ -259,7 +259,7 @@ module "eks_blueprints_addons" {
       chart_version    = "15.17.0"
       repository       = "https://prometheus-community.github.io/helm-charts"
       values = [templatefile("${path.module}/../../charts/values/prometheus.yaml", {
-        aws_htc_ecr  = var.aws_htc_ecr
+        aws_htc_ecr            = var.aws_htc_ecr
         region                 = var.region
         kube_state_metrics_tag = var.prometheus_configuration.kube_state_metrics_tag
         configmap_reload_tag   = var.prometheus_configuration.configmap_reload_tag

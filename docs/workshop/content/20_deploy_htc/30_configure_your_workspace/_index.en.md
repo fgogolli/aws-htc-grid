@@ -45,7 +45,6 @@ Use the [GetCallerIdentity](https://docs.aws.amazon.com/cli/latest/reference/sts
 
 ```
 aws sts get-caller-identity
-
 ```
 
 

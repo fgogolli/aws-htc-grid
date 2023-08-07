@@ -41,7 +41,7 @@ The section highlighted provides a few information of the changes that we are ap
 To apply this change, we just need to point and apply the new configuration using terraform.
 
 ```
-make apply-python-runtime TAG=$TAG REGION=$HTCGRID_REGION GRAFANA_ADMIN_PASSWORD=<my_grafana_admin_password>
+make apply-python-runtime TAG=$TAG REGION=$HTCGRID_REGION GRAFANA_ADMIN_PASSWORD='<my_grafana_admin_password>'
 ```
 
 {{% notice note %}}
