@@ -55,7 +55,6 @@ datasources:
         httpMode: POST
 
 
-
 dashboardProviders:
   dashboardproviders.yaml:
     apiVersion: 1

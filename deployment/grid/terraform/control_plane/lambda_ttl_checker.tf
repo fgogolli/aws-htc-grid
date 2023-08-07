@@ -6,6 +6,7 @@
 module "ttl_checker" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "4.6.1"
+
   source_path = [
     "../../../source/control_plane/python/lambda/ttl_checker",
     {

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 # Create zip-archive of a single directory where "pip install" will also be executed (default for python runtime)
 module "lambda_drainer" {
   source  = "terraform-aws-modules/lambda/aws"

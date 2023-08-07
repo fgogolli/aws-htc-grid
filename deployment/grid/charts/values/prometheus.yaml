@@ -1,3 +1,7 @@
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+# Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
+
 server:
   retention: 1h
 
@@ -23,8 +27,10 @@ server:
   nodeSelector:
     htc/node-type: "core"
 
+
 alertmanager:
   enabled: false
+
 
 kube-state-metrics:
   enabled: true
@@ -46,8 +52,10 @@ kube-state-metrics:
   nodeSelector:
     htc/node-type: "core"
 
+
 pushgateway:
   enabled: false
+
 
 nodeExporter:
   image:
@@ -73,4 +81,3 @@ configmapReload:
     image:
       repository: ${account_id}.dkr.ecr.${region}.amazonaws.com/configmap-reload
       tag: ${configmap_reload_tag}
-
