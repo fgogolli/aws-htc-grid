@@ -5,7 +5,7 @@
 
 module "scaling_metrics" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "4.6.1"
+  version = "~> 5.0"
 
   source_path = [
     "../../../source/compute_plane/python/lambda/scaling_metrics/",

@@ -5,7 +5,7 @@
 
 module "get_results" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "4.6.1"
+  version = "~> 5.0"
 
   source_path = [
     "../../../source/control_plane/python/lambda/get_results",

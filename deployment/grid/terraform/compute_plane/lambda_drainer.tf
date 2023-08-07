@@ -6,7 +6,7 @@
 # Create zip-archive of a single directory where "pip install" will also be executed (default for python runtime)
 module "lambda_drainer" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "4.6.1"
+  version = "~> 5.0"
 
   source_path     = "../../../source/compute_plane/python/lambda/drainer"
   function_name   = "lambda_drainer-${local.suffix}"
