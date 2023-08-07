@@ -47,7 +47,7 @@ Parameters:
     Type: String
     Default: v3.12.2
     ConstraintDescription: Must be a valid helm version
-  HTCgridVersion:
+  HTCGridVersion:
     Description: HTC Grid Version to install on Cloud9
     Type: String
     Default: 0.3.5
@@ -343,8 +343,9 @@ Resources:
                 - sudo growpart /dev/nvme0n1 1
                 - sudo xfs_growfs -d /
                 - echo "=== Downloading HTC-Grid project ==="
-                - !Sub 'export HTCGRID_VERSION=${HTCgridVersion}'
-                - curl --silent --location -o /home/ec2-user/environment/aws-htc-grid.tar.gz "https://github.com/awslabs/aws-htc-grid/archive/refs/tags/v${HTCGRID_VERSION}.tar.gz"
+                - !Sub 'export HTCGRID_VERSION=${HTCGridVersion}'
+                - if [ "${HTCGRID_VERSION}" == "main" ]; then export HTCGRID_URI_REF="heads/main"; else export HTCGRID_URI_REF="tags/v${HTCGRID_VERSION}"; fi
+                - curl --silent --location -o /home/ec2-user/environment/aws-htc-grid.tar.gz "https://github.com/awslabs/aws-htc-grid/archive/refs/${HTCGRID_URI_REF}.tar.gz"
                 - cd /home/ec2-user/environment; tar xzvf aws-htc-grid.tar.gz
                 - mv aws-htc-grid-${HTCGRID_VERSION}/ aws-htc-grid
                 - sudo chown -R ec2-user:ec2-user /home/ec2-user/environment/
