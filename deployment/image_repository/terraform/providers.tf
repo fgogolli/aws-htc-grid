@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 terraform {
   backend "s3" {
     key    = ".terraform/terraform.tfstate"
@@ -20,14 +21,10 @@ terraform {
 }
 
 
-
-
 provider "aws" {
   region = var.region
 }
 
+
 provider "null" {
 }
-
-
-

@@ -2,14 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
+
 # retrieve the account ID
 data "aws_caller_identity" "current" {}
+
 
 # create all ECR repository
 resource "aws_ecr_repository" "third_party" {
   count = length(var.repository)
   name  = var.repository[count.index]
 }
+
 
 # authenticate to ECR repository
 resource "null_resource" "authenticate_to_ecr_repository" {
@@ -21,15 +24,18 @@ resource "null_resource" "authenticate_to_ecr_repository" {
   }
 }
 
+
 resource "aws_ecr_pull_through_cache_rule" "ecr-public" {
   ecr_repository_prefix = "ecr-public"
   upstream_registry_url = "public.ecr.aws"
 }
 
+
 resource "aws_ecr_pull_through_cache_rule" "quay" {
   ecr_repository_prefix = "quay"
   upstream_registry_url = "quay.io"
 }
+
 
 resource "null_resource" "pull_python_env" {
   triggers = {
@@ -43,6 +49,7 @@ resource "null_resource" "pull_python_env" {
     null_resource.copy_image
   ]
 }
+
 
 # push tag and pull images from every image to copy
 resource "null_resource" "copy_image" {

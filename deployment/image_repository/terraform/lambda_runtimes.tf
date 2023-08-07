@@ -3,7 +3,6 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
 
-
 #########################################
 ##### build and push custom runtime #####
 #########################################
@@ -19,6 +18,7 @@ resource "null_resource" "build_provided" {
   # ]
 }
 
+
 resource "null_resource" "push_provided" {
   triggers = {
     always_run = timestamp()
@@ -31,6 +31,7 @@ resource "null_resource" "push_provided" {
     null_resource.build_provided
   ]
 }
+
 
 #########################################
 ##### build and push python runtime #####
@@ -47,6 +48,7 @@ resource "null_resource" "build_python38" {
   # ]
 }
 
+
 resource "null_resource" "push_python38" {
   triggers = {
     always_run = timestamp()
@@ -59,6 +61,7 @@ resource "null_resource" "push_python38" {
     null_resource.build_python38
   ]
 }
+
 
 #########################################
 ##### build and push dotnet runtime #####
@@ -75,6 +78,7 @@ resource "null_resource" "build_dotnet50" {
   # ]
 }
 
+
 resource "null_resource" "push_dotnet50" {
   triggers = {
     always_run = timestamp()
@@ -87,6 +91,7 @@ resource "null_resource" "push_dotnet50" {
     null_resource.build_dotnet50
   ]
 }
+
 
 #########################################
 ##### build and push java runtime #####

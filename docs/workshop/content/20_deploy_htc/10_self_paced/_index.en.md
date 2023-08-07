@@ -56,7 +56,7 @@ Just follow the process below in your account to deploy the Cloud9 Cloudformatio
 
     {{< img "Cloud9-stack-creation-1.png" "Cloud9 stack creation 1" >}}
 
-1. Set the name of the stack to **htc-grid-workshop** . With a memorable name, later on it will be easier to identify and clean up the resources. Click on **Next**.
+1. Set the name of the stack to **htc-grid-workshop**. With a memorable name, later on it will be easier to identify and clean up the resources. Click on **Next**.
 
     {{< img "Cloud9-stack-creation-2.png" "Cloud9 stack creation 2" >}}
 

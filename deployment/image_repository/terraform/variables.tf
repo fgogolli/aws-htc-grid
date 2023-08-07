@@ -19,6 +19,6 @@ variable "repository" {
 
 variable "lambda_runtime" {
   description = "runtime used for the custom worker"
-  default     = "python3.7"
   type        = string
+  default     = "python3.7"
 }
