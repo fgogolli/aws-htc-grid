@@ -58,6 +58,7 @@ locals {
 }
 
 
+# As used in the EKS Blueprints Addons: https://github.com/aws-ia/terraform-aws-eks-blueprints-addons/blob/main/helm.tf
 resource "helm_release" "this" {
   for_each = local.helm_releases
 
@@ -126,7 +127,7 @@ resource "helm_release" "this" {
   }
 
   depends_on = [
-    # Wait for EKS Blueprints Addons to be installed first
-    module.eks_blueprints_addons,
+    # Wait for EKS Blueprints Addons to be deployed first
+    time_sleep.eks_blueprints_addons_dependency,
   ]
 }

@@ -42,7 +42,7 @@ You should leave this step for the very end, once that all the other cleanup pro
 {{% /notice %}}
 
 
-Finally, we will delete CloudFormarion stack which manages the S3 buckets that contain our Terraform state, by running the following command:
+Finally, we will delete CloudFormation stack which manages the S3 buckets that contain our Terraform state, by running the following command:
 
 ```
 make delete-grid-state TAG=$TAG REGION=$HTCGRID_REGION

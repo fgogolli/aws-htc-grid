@@ -23,7 +23,7 @@ The execution of this command will prompt for `yes` to continue. Just type `yes`
 {{% /notice %}}
 
 {{% notice warning %}}
-The installation may take ~30mins. If the `terraform apply` fails with the following error, then it will be due to  [known issue](https://github.com/aws/containers-roadmap/issues/1389) in the CoreDNS AddOn and should be fixed in a future release.
+The installation may take 20-30mins. If the `terraform apply` step above fails with the following error, then it will be due to a [known issue](https://github.com/aws/containers-roadmap/issues/1389) in the CoreDNS AddOn and should be fixed in a future release.
 To fix this error, please run the `delete-addon` command below first and then re-run the `apply-custom-runtime` step from above.
 
 ```

@@ -158,6 +158,24 @@ module "eks_blueprints_addons" {
       k8s_ca_version = var.k8s_ca_version
     })]
   }
+
+  depends_on = [
+    # Wait for EKS to be deployed first
+    module.eks,
+  ]
+}
+
+
+resource "time_sleep" "eks_blueprints_addons_dependency" {
+  # Giving TF some time to create the  EKS Blueprints Addons, ie the AWS Load Balancer Controller
+  # and CoreDns and also allowing ie AWS LB Controller to delete resources before it is destroyed
+  create_duration  = "30s"
+  destroy_duration = "60s"
+
+  triggers = {
+    aws_load_balancer_controller = module.eks_blueprints_addons.aws_load_balancer_controller.name
+    coredns_arn                  = module.eks_blueprints_addons.eks_addons["coredns"].arn
+  }
 }
 
 
