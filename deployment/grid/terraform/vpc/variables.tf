@@ -32,3 +32,7 @@ variable "enable_private_subnet" {
   type        = bool
   default     = false
 }
+
+variable "allowed_access_cidr_blocks" {
+  description = "List of CIDR blocks which are allowed ingress/egress access from/to the VPC"
+}

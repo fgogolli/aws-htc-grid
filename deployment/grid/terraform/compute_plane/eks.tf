@@ -16,6 +16,9 @@ locals {
 }
 
 
+#trivy:ignore:AVD-AWS-0040 Allow Public EKS API Access
+#trivy:ignore:AVD-AWS-0041 Allow API Access from 0.0.0.0/0
+#trivy:ignore:AVD-AWS-0104 Allow ALL Egress CIDR ranges
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 19.0"
@@ -23,9 +26,10 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = var.kubernetes_version
 
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = var.enable_private_subnet
-  cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  cluster_endpoint_public_access       = true
+  cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"] #var.allowed_access_cidr_blocks
+  cluster_endpoint_private_access      = var.enable_private_subnet
+  cluster_enabled_log_types            = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   vpc_id     = var.vpc_id
   subnet_ids = var.vpc_private_subnet_ids

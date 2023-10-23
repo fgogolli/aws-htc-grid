@@ -36,12 +36,14 @@ module "submit_task" {
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler     = "submit_tasks.lambda_handler"
-  memory_size = 1024
-  timeout     = 300
-  runtime     = var.lambda_runtime
-  create_role = false
-  lambda_role = aws_iam_role.role_lambda_submit_task.arn
+  handler               = "submit_tasks.lambda_handler"
+  memory_size           = 1024
+  timeout               = 300
+  runtime               = var.lambda_runtime
+  create_role           = false
+  lambda_role           = aws_iam_role.role_lambda_submit_task.arn
+  attach_tracing_policy = true
+  tracing_mode          = "PassThrough"
 
   vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
@@ -60,8 +62,8 @@ module "submit_task" {
     GRID_STORAGE_SERVICE                          = var.grid_storage_service,
     TASK_QUEUE_SERVICE                            = var.task_queue_service,
     TASK_QUEUE_CONFIG                             = var.task_queue_config,
-    S3_BUCKET                                     = aws_s3_bucket.htc-stdout-bucket.id,
-    REDIS_URL                                     = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
+    S3_BUCKET                                     = aws_s3_bucket.htc_stdout_bucket.id,
+    REDIS_URL                                     = aws_elasticache_cluster.stdin_stdout_cache.cache_nodes.0.address,
     METRICS_GRAFANA_PRIVATE_IP                    = var.nlb_influxdb,
     REGION                                        = var.region
   }
@@ -93,13 +95,21 @@ EOF
 }
 
 
-resource "aws_iam_role_policy_attachment" "lambda_logs_attachment" {
+resource "aws_iam_role_policy_attachment" "submit_lambda_policy_attachment" {
+  for_each = { for k, v in aws_iam_policy.lambda_permissions : k => v.arn }
+
   role       = aws_iam_role.role_lambda_submit_task.name
-  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  policy_arn = each.value
 }
 
 
-resource "aws_iam_role_policy_attachment" "lambda_data_attachment" {
-  role       = aws_iam_role.role_lambda_submit_task.name
-  policy_arn = aws_iam_policy.lambda_data_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "lambda_logs_attachment" {
+#   role       = aws_iam_role.role_lambda_submit_task.name
+#   policy_arn = aws_iam_policy.lambda_logging_policy.arn
+# }
+
+
+# resource "aws_iam_role_policy_attachment" "lambda_data_attachment" {
+#   role       = aws_iam_role.role_lambda_submit_task.name
+#   policy_arn = aws_iam_policy.lambda_data_policy.arn
+# }

@@ -63,9 +63,9 @@ output "cognito_userpool_client_id" {
   value       = aws_cognito_user_pool_client.user_data_client.id
 }
 
-output "agent_permissions_policy_arn" {
-  description = "OIDC Provider ARN for the EKS Cluster"
-  value       = aws_iam_policy.agent_permissions.arn
+output "agent_permissions_policy_arns" {
+  description = "The Policy ARNs for the Agent Permissions"
+  value       = local.agent_permissions_policy_arns
 }
 
 output "grafana_ingress_domain" {
