@@ -35,12 +35,14 @@ module "ttl_checker" {
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler     = "ttl_checker.lambda_handler"
-  memory_size = 1024
-  timeout     = 55
-  runtime     = var.lambda_runtime
-  create_role = false
-  lambda_role = aws_iam_role.role_lambda_ttl_checker.arn
+  handler               = "ttl_checker.lambda_handler"
+  memory_size           = 1024
+  timeout               = 55
+  runtime               = var.lambda_runtime
+  create_role           = false
+  lambda_role           = aws_iam_role.role_lambda_ttl_checker.arn
+  attach_tracing_policy = true
+  tracing_mode          = "PassThrough"
 
   vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
@@ -132,16 +134,24 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_ttl_checker_lambda" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "ttl_checker_lambda_logs_attachment" {
+resource "aws_iam_role_policy_attachment" "ttl_checker_lambda_policy_attachment" {
+  for_each = { for k, v in aws_iam_policy.lambda_permissions : k => v.arn }
+
   role       = aws_iam_role.role_lambda_ttl_checker.name
-  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  policy_arn = each.value
 }
 
 
-resource "aws_iam_role_policy_attachment" "ttl_checker_lambda_data_attachment" {
-  role       = aws_iam_role.role_lambda_ttl_checker.name
-  policy_arn = aws_iam_policy.lambda_data_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "ttl_checker_lambda_logs_attachment" {
+#   role       = aws_iam_role.role_lambda_ttl_checker.name
+#   policy_arn = aws_iam_policy.lambda_logging_policy.arn
+# }
+
+
+# resource "aws_iam_role_policy_attachment" "ttl_checker_lambda_data_attachment" {
+#   role       = aws_iam_role.role_lambda_ttl_checker.name
+#   policy_arn = aws_iam_policy.lambda_data_policy.arn
+# }
 
 
 resource "aws_iam_role_policy_attachment" "ttl_checker_lambda_cludwatch_attachment" {

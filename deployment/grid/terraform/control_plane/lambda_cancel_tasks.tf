@@ -36,12 +36,14 @@ module "cancel_tasks" {
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler     = "cancel_tasks.lambda_handler"
-  memory_size = 1024
-  timeout     = 300
-  runtime     = var.lambda_runtime
-  create_role = false
-  lambda_role = aws_iam_role.role_lambda_cancel_tasks.arn
+  handler               = "cancel_tasks.lambda_handler"
+  memory_size           = 1024
+  timeout               = 300
+  runtime               = var.lambda_runtime
+  create_role           = false
+  lambda_role           = aws_iam_role.role_lambda_cancel_tasks.arn
+  attach_tracing_policy = true
+  tracing_mode          = "PassThrough"
 
   vpc_subnet_ids         = var.vpc_private_subnet_ids
   vpc_security_group_ids = [var.vpc_default_security_group_id]
@@ -60,8 +62,8 @@ module "cancel_tasks" {
     GRID_STORAGE_SERVICE                          = var.grid_storage_service,
     TASK_QUEUE_SERVICE                            = var.task_queue_service,
     TASK_QUEUE_CONFIG                             = var.task_queue_config,
-    S3_BUCKET                                     = aws_s3_bucket.htc-stdout-bucket.id,
-    REDIS_URL                                     = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address,
+    S3_BUCKET                                     = aws_s3_bucket.htc_stdout_bucket.id,
+    REDIS_URL                                     = aws_elasticache_cluster.stdin_stdout_cache.cache_nodes.0.address,
     METRICS_GRAFANA_PRIVATE_IP                    = var.nlb_influxdb,
     REGION                                        = var.region
   }
@@ -93,14 +95,21 @@ EOF
 }
 
 
+resource "aws_iam_role_policy_attachment" "cancel_tasks_lambda_policy_attachment" {
+  for_each = { for k, v in aws_iam_policy.lambda_permissions : k => v.arn }
 
-resource "aws_iam_role_policy_attachment" "cancel_tasks_lambda_logs_attachment" {
   role       = aws_iam_role.role_lambda_cancel_tasks.name
-  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  policy_arn = each.value
 }
 
 
-resource "aws_iam_role_policy_attachment" "cancel_tasks_lambda_data_attachment" {
-  role       = aws_iam_role.role_lambda_cancel_tasks.name
-  policy_arn = aws_iam_policy.lambda_data_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "cancel_tasks_lambda_logs_attachment" {
+#   role       = aws_iam_role.role_lambda_cancel_tasks.name
+#   policy_arn = aws_iam_policy.lambda_logging_policy.arn
+# }
+
+
+# resource "aws_iam_role_policy_attachment" "cancel_tasks_lambda_data_attachment" {
+#   role       = aws_iam_role.role_lambda_cancel_tasks.name
+#   policy_arn = aws_iam_policy.lambda_data_policy.arn
+# }

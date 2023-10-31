@@ -36,13 +36,17 @@ module "scaling_metrics" {
   docker_additional_options = [
     "--platform", "linux/amd64",
   ]
-  handler                           = "scaling_metrics.lambda_handler"
-  memory_size                       = 1024
-  timeout                           = 60
-  runtime                           = var.lambda_runtime
-  create_role                       = false
-  lambda_role                       = aws_iam_role.role_scaling_metrics.arn
-  use_existing_cloudwatch_log_group = false
+  handler               = "scaling_metrics.lambda_handler"
+  memory_size           = 1024
+  timeout               = 60
+  runtime               = var.lambda_runtime
+  create_role           = false
+  lambda_role           = aws_iam_role.role_scaling_metrics.arn
+  attach_tracing_policy = true
+  tracing_mode          = "PassThrough"
+
+
+  # use_existing_cloudwatch_log_group = false
 
   environment_variables = {
     STATE_TABLE_CONFIG   = var.ddb_state_table,
@@ -123,7 +127,7 @@ resource "aws_iam_policy" "scaling_metrics_logging_policy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "arn:${local.partition}:logs:*:*:*",
+      "Resource": "arn:${local.partition}:logs:${var.region}:${local.account_id}:*",
       "Effect": "Allow"
     }
   ]
@@ -142,14 +146,115 @@ resource "aws_iam_policy" "scaling_metrics_data_policy" {
   "Statement": [
     {
       "Action": [
-        "dynamodb:*",
-        "sqs:*",
-        "cloudwatch:PutMetricData",
+        "sqs:DeleteMessage",
+        "sqs:StartMessageMoveTask",
+        "sqs:GetQueueUrl",
+        "sqs:ListQueues",
+        "sqs:CancelMessageMoveTask",
+        "sqs:ChangeMessageVisibility",
+        "sqs:ListMessageMoveTasks",
+        "sqs:UntagQueue",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:ListQueueTags",
+        "sqs:TagQueue",
+        "sqs:RemovePermission",
+        "sqs:ListDeadLetterSourceQueues",
+        "sqs:AddPermission",
+        "sqs:PurgeQueue",
+        "sqs:DeleteQueue",
+        "sqs:CreateQueue",
+        "sqs:SetQueueAttributes"
+      ],
+      "Resource": "arn:${local.partition}:sqs:${var.region}:${local.account_id}:*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "dynamodb:DescribeContributorInsights",
+        "dynamodb:RestoreTableToPointInTime",
+        "dynamodb:UpdateGlobalTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:UpdateTableReplicaAutoScaling",
+        "dynamodb:DescribeTable",
+        "dynamodb:PartiQLInsert",
+        "dynamodb:GetItem",
+        "dynamodb:DescribeContinuousBackups",
+        "dynamodb:DescribeExport",
+        "dynamodb:ListImports",
+        "dynamodb:EnableKinesisStreamingDestination",
+        "dynamodb:BatchGetItem",
+        "dynamodb:DisableKinesisStreamingDestination",
+        "dynamodb:UpdateTimeToLive",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:PartiQLUpdate",
+        "dynamodb:Scan",
+        "dynamodb:StartAwsBackupJob",
+        "dynamodb:UpdateItem",
+        "dynamodb:UpdateGlobalTableSettings",
+        "dynamodb:CreateTable",
+        "dynamodb:RestoreTableFromAwsBackup",
+        "dynamodb:GetShardIterator",
+        "dynamodb:DescribeReservedCapacity",
+        "dynamodb:ExportTableToPointInTime",
+        "dynamodb:DescribeEndpoints",
+        "dynamodb:DescribeBackup",
+        "dynamodb:UpdateTable",
+        "dynamodb:GetRecords",
+        "dynamodb:DescribeTableReplicaAutoScaling",
+        "dynamodb:DescribeImport",
+        "dynamodb:ListTables",
+        "dynamodb:DeleteItem",
+        "dynamodb:PurchaseReservedCapacityOfferings",
+        "dynamodb:CreateTableReplica",
+        "dynamodb:ListTagsOfResource",
+        "dynamodb:UpdateContributorInsights",
+        "dynamodb:CreateBackup",
+        "dynamodb:UpdateContinuousBackups",
+        "dynamodb:DescribeReservedCapacityOfferings",
+        "dynamodb:TagResource",
+        "dynamodb:PartiQLSelect",
+        "dynamodb:UpdateGlobalTableVersion",
+        "dynamodb:CreateGlobalTable",
+        "dynamodb:DescribeKinesisStreamingDestination",
+        "dynamodb:DescribeLimits",
+        "dynamodb:ImportTable",
+        "dynamodb:ListExports",
+        "dynamodb:UntagResource",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:ListBackups",
+        "dynamodb:Query",
+        "dynamodb:DescribeStream",
+        "dynamodb:DeleteTableReplica",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:ListStreams",
+        "dynamodb:ListContributorInsights",
+        "dynamodb:DescribeGlobalTableSettings",
+        "dynamodb:ListGlobalTables",
+        "dynamodb:DescribeGlobalTable",
+        "dynamodb:RestoreTableFromBackup",
+        "dynamodb:DeleteBackup",
+        "dynamodb:PartiQLDelete"
+      ],
+      "Resource": "arn:${local.partition}:dynamodb:${var.region}:${local.account_id}:*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
         "ec2:CreateNetworkInterface",
         "ec2:DeleteNetworkInterface",
         "ec2:DescribeNetworkInterfaces"
       ],
-      "Resource": "*",
+      "Resource": "arn:${local.partition}:ec2:${var.region}:${local.account_id}:*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "cloudwatch:PutMetricData"
+      ],
+      "Resource": "arn:${local.partition}:cloudwatch:${var.region}:${local.account_id}:*",
       "Effect": "Allow"
     }
   ]

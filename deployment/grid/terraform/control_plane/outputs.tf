@@ -4,12 +4,12 @@
 
 output "redis_url" {
   description = "Redis URL"
-  value       = aws_elasticache_cluster.stdin-stdout-cache.cache_nodes.0.address
+  value       = aws_elasticache_cluster.stdin_stdout_cache.cache_nodes.0.address
 }
 
 output "s3_bucket_name" {
   description = "Name of the bucket"
-  value       = aws_s3_bucket.htc-stdout-bucket.id
+  value       = aws_s3_bucket.htc_stdout_bucket.id
 }
 
 output "public_api_gateway_url" {

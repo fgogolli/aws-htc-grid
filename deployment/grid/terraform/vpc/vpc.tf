@@ -3,6 +3,12 @@
 # Licensed under the Apache License, Version 2.0 https://aws.amazon.com/apache-2-0/
 
 
+locals {
+  allowed_access_cidr_blocks = ["0.0.0.0/0"] #concat(var.allowed_access_cidr_blocks, ["10.0.0.0/16", "0.0.0.0/0"])
+  allowed_access_ports       = [0]           #[0, 80, 443, 6379, 10250]
+}
+
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 5.0"
@@ -37,10 +43,56 @@ module "vpc" {
       from_port        = 0
       to_port          = 0
       type             = "egress"
-      cidr_blocks      = "0.0.0.0/0"
+      cidr_blocks      = "0.0.0.0/0" #var.allowed_access_cidr_blocks
       ipv6_cidr_blocks = "::/0"
     }
   ]
+
+  # default_security_group_egress = flatten([
+  #   for cidr_block in var.allowed_access_cidr_blocks : [
+  #     {
+  #       description = "Allow ALL Egress to ${cidr_block}"
+  #       protocol    = "-1"
+  #       from_port   = 0
+  #       to_port     = 0
+  #       type        = "egress"
+  #       cidr_blocks = cidr_block
+  #       # ipv6_cidr_blocks = "::/0"
+  #     }
+  #   ]
+  # ])
+
+  # default_network_acl_ingress = flatten([
+  #   for cidr_block in local.allowed_access_cidr_blocks : [for port in local.allowed_access_ports :
+  #     {
+  #       action     = "allow",
+  #       cidr_block = cidr_block,
+  #       from_port  = port,
+  #       to_port    = port,
+  #       protocol   = "tcp",
+  #       rule_no    = index(local.allowed_access_cidr_blocks, cidr_block) * length(local.allowed_access_ports) + index(local.allowed_access_ports, port) + 100
+  #     }
+  #   ]
+  # ])
+
+  # Disable dedicated Private Subnet ACL (as using default)
+  private_dedicated_network_acl = false
+  private_inbound_acl_rules     = []
+  private_outbound_acl_rules    = []
+
+  # Disable dedicated Public Subnet ACL (as using default)
+  public_dedicated_network_acl = false
+  public_inbound_acl_rules     = []
+  public_outbound_acl_rules    = []
+
+  # Cloudwatch log group and IAM role will be created
+  enable_flow_log                      = true
+  create_flow_log_cloudwatch_log_group = true
+  create_flow_log_cloudwatch_iam_role  = true
+
+  flow_log_max_aggregation_interval         = 60
+  flow_log_cloudwatch_log_group_name_prefix = "/aws/vpc-flow-logs/"
+  flow_log_cloudwatch_log_group_name_suffix = var.cluster_name
 
   tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"

@@ -158,6 +158,10 @@ variable "vpc_cidr" {
   description = "Default VPC CIDR"
 }
 
+variable "allowed_access_cidr_blocks" {
+  description = "List of CIDR blocks which are allowed ingress/egress access from/to the VPC"
+}
+
 variable "nlb_influxdb" {
   description = "network load balancer url  in front of influxdb"
   default     = ""

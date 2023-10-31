@@ -382,6 +382,12 @@ variable "vpc_cidr_block_private" {
   default     = 24
 }
 
+variable "allowed_access_cidr_blocks" {
+  description = "List of CIDR blocks which are allowed ingress/egress access from/to the VPC"
+  type        = list(any)
+  default     = []
+}
+
 variable "project_name" {
   description = "name of project"
   type        = string

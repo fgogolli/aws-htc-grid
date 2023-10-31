@@ -161,11 +161,9 @@ module "htc-agent" {
   set_irsa_names = ["serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"]
 
   # IAM role for service account (IRSA)
-  create_role = true
-  role_name   = "role_htc_agent_sa-${local.suffix}"
-  role_policies = {
-    agent_permissions = var.agent_permissions_policy_arn
-  }
+  create_role   = true
+  role_name     = "role_htc_agent_sa-${local.suffix}"
+  role_policies = var.agent_permissions_policy_arns
 
   oidc_providers = {
     this = {

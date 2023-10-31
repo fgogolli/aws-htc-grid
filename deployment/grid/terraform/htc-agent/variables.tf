@@ -24,9 +24,9 @@ variable "agent_image_tag" {
   type        = string
 }
 
-variable "agent_permissions_policy_arn" {
-  type        = string
-  description = "IAM Policy ARN for HTC Agent IRSA Permissions"
+variable "agent_permissions_policy_arns" {
+  description = "IAM Policy ARNs for HTC Agent IRSA Permissions"
+  type        = map(string)
 }
 
 variable "suffix" {

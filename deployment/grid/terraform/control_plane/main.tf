@@ -6,11 +6,20 @@
 locals {
   # check if var.suffix is empty then create a random suffix else use var.suffix
   suffix               = var.suffix != "" ? var.suffix : random_string.random.result
+  account_id           = data.aws_caller_identity.current.account_id
+  dns_suffix           = data.aws_partition.current.dns_suffix
+  partition            = data.aws_partition.current.partition
   lambda_build_runtime = "${var.aws_htc_ecr}/ecr-public/sam/build-${var.lambda_runtime}:1"
+  sqs_queues_arns      = join(", ", concat([for queue in aws_sqs_queue.htc_task_queue : queue.arn], [aws_sqs_queue.htc_task_queue_dlq.arn]))
 }
 
 
+# Retrieve the account ID
 data "aws_caller_identity" "current" {}
+
+
+# Retrieve AWS Partition
+data "aws_partition" "current" {}
 
 
 resource "random_string" "random" {
@@ -30,54 +39,4 @@ resource "aws_cloudwatch_log_group" "global_error_group" {
 resource "aws_cloudwatch_log_stream" "global_error_stream" {
   name           = var.error_logging_stream
   log_group_name = aws_cloudwatch_log_group.global_error_group.name
-}
-
-
-resource "aws_iam_policy" "lambda_logging_policy" {
-  name        = "lambda_logging_policy-${local.suffix}"
-  path        = "/"
-  description = "IAM policy for logging from a lambda"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogStreams"
-      ],
-      "Resource": "arn:aws:logs:*:*:*",
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-
-resource "aws_iam_policy" "lambda_data_policy" {
-  name        = "lambda_data_policy-${local.suffix}"
-  path        = "/"
-  description = "IAM policy for accessing DDB and SQS from a lambda"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "sqs:*",
-        "dynamodb:*",
-        "firehose:*",
-        "s3:*",
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeNetworkInterfaces"
-      ],
-      "Resource": "*",
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
 }
