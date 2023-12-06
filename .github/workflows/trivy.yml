@@ -7,12 +7,15 @@ on: [push, pull_request]
 
 jobs:
   trivy:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
     runs-on: ubuntu-latest
     env:
       NEW_BRANCH: new_branch
       MAIN_BRANCH: main_branch
-      NEW_BRANCH_REPORT_FILE: new_branch_trivy_report_file.json
-      MAIN_BRANCH_REPORT_FILE: main_branch_trivy_report_file.json
+      NEW_BRANCH_REPORT_FILE: new_branch_trivy_report_file.sarif
+      MAIN_BRANCH_REPORT_FILE: main_branch_trivy_report_file.sarif
       DIFF_REPORTS_FILE: diff_trivy_reports.txt
 
     steps:
@@ -26,19 +29,6 @@ jobs:
         with:
           repository: awslabs/aws-htc-grid
           path: ${{ env.MAIN_BRANCH }}
-
-      - name: Run Trivy with annotations on the new branch
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: ${{ env.NEW_BRANCH }}
-          ignore-unfixed: true
-          severity: UNKNOWN,MEDIUM,HIGH,CRITICAL
-          format: 'github'
-          scanners: 'vuln,config'
-          skip-dirs: '**/.terraform,venv'
-          github-pat: ${{ secrets.GITHUB_TOKEN }}
-          # trivy-config: "${{ env.NEW_BRANCH }}/.github/workflows/trivy.conf"
 
       - name: Run Trivy in fs mode on the new branch
         uses: aquasecurity/trivy-action@master
@@ -64,12 +54,17 @@ jobs:
         env:
           TRIVY_OUTPUT: ${{ env.MAIN_BRANCH_REPORT_FILE }}
 
+      # As per the following issue/solution: https://github.com/aquasecurity/trivy/issues/5003
+      - name: Fix trivy SARIF report for URI scheme
+        run: |-
+          sed -i 's#git::https:/##g' ${{ env.NEW_BRANCH_REPORT_FILE }}
+
       # This action can be enabled when using GitHub Security Code Scanning feature
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   if: success() || failure()
-      #   with:
-      #     sarif_file: "${{ env.NEW_BRANCH_REPORT_FILE }}"
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: "${{ env.NEW_BRANCH_REPORT_FILE }}"
 
       - name: Save report results for the new branch
         uses: actions/upload-artifact@v3
