@@ -27,6 +27,19 @@ jobs:
           repository: awslabs/aws-htc-grid
           path: ${{ env.MAIN_BRANCH }}
 
+      - name: Run Trivy with annotations on the new branch
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: ${{ env.NEW_BRANCH }}
+          ignore-unfixed: true
+          severity: UNKNOWN,MEDIUM,HIGH,CRITICAL
+          format: 'github'
+          scanners: 'vuln,config'
+          skip-dirs: '**/.terraform,venv'
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
+          # trivy-config: "${{ env.NEW_BRANCH }}/.github/workflows/trivy.conf"
+
       - name: Run Trivy in fs mode on the new branch
         uses: aquasecurity/trivy-action@master
         with:

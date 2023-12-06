@@ -27,21 +27,35 @@ jobs:
           repository: awslabs/aws-htc-grid
           path: ${{ env.MAIN_BRANCH }}
 
-      - name: Install flake8
-        run: |-
-          pip3 install flake8
-          ls -l -a
-          pwd
+      # - name: Install flake8
+      #   run: |-
+      #     pip3 install flake8
+      #     ls -l -a
+      #     pwd
 
       - name: Run flake8 on the new branch
-        run: |-
-          flake8 --config ${{ env.NEW_BRANCH }}/.github/workflows/flake8.conf \
-                 --exit-zero --output-file ${{ env.NEW_BRANCH_REPORT_FILE }} ${{ env.NEW_BRANCH }}
+        uses: py-actions/flake8@v2
+        with:
+          path: ${{ env.NEW_BRANCH }}
+          args: --config ${{ env.NEW_BRANCH }}/.github/workflows/flake8.conf --output-file ${{ env.NEW_BRANCH_REPORT_FILE }}
+        continue-on-error: true
 
-      - name: Run flake8 on the main branch
-        run: |-
-          flake8 --config ${{ env.NEW_BRANCH }}/.github/workflows/flake8.conf \
-                 --exit-zero --output-file ${{ env.MAIN_BRANCH_REPORT_FILE }} ${{ env.MAIN_BRANCH }}
+      - name: Run flake8 on main
+        uses: py-actions/flake8@v2
+        with:
+          path: ${{ env.MAIN_BRANCH }}
+          args: --config ${{ env.NEW_BRANCH }}/.github/workflows/flake8.conf --output-file ${{ env.MAIN_BRANCH_REPORT_FILE }}
+        continue-on-error: true
+
+      # - name: Run flake8 on the new branch
+      #   run: |-
+      #     flake8 --config ${{ env.NEW_BRANCH }}/.github/workflows/flake8.conf \
+      #           --exit-zero --output-file ${{ env.NEW_BRANCH_REPORT_FILE }} ${{ env.NEW_BRANCH }}
+
+      # - name: Run flake8 on the main branch
+      #   run: |-
+      #     flake8 --config ${{ env.NEW_BRANCH }}/.github/workflows/flake8.conf \
+      #           --exit-zero --output-file ${{ env.MAIN_BRANCH_REPORT_FILE }} ${{ env.MAIN_BRANCH }}
 
       - name: Save report results for the new branch
         uses: actions/upload-artifact@v3
