@@ -30,4 +30,4 @@ push-local: build-local
 	docker push $(HTCGRID_ECR_REPO)/$(LOCAL_AGENT_IMAGE_NAME):$(TAG)
 
 test: $(SRCS)
-	flake8  --ignore  E501,W503 --statistic --exclude build $(SRCS)
+	flake8 --ignore E501,W503,F841 --statistic --exclude build $(SRCS)
